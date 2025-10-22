@@ -1,0 +1,379 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Gestión de Camiones - Sistema de Repartos">
+  <div id="app" class="min-h-screen bg-gray-50">
+    <!-- Loading state -->
+    <div id="loading" class="flex items-center justify-center min-h-screen">
+      <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Main content -->
+    <div id="mainContent" class="hidden">
+      <!-- Header -->
+      <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Gestión de Camiones</h1>
+              <p class="text-gray-600">Administra tu flota de vehículos</p>
+            </div>
+            <div class="flex items-center space-x-4">
+              <button 
+                id="addTruckBtn"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                + Nuevo Camión
+              </button>
+              <span id="userName" class="text-gray-700"></span>
+              <button 
+                id="logoutBtn"
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Navigation -->
+      <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex space-x-8">
+            <a href="/dashboard" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Dashboard</a>
+            <a href="/clientes" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Clientes</a>
+            <a href="/camiones" class="px-3 py-4 text-white border-b-2 border-white font-medium">Camiones</a>
+            <a href="/repartos" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Repartos</a>
+            <a href="/mapa" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Mapa</a>
+            <a href="/reportes" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Reportes</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="shrink-0">
+                <div class="bg-green-500 rounded-lg p-3 text-white text-2xl">🚛</div>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Camiones</p>
+                <p id="totalTrucks" class="text-2xl font-semibold text-gray-900">0</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="shrink-0">
+                <div class="bg-blue-500 rounded-lg p-3 text-white text-2xl">📦</div>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">En Repartos</p>
+                <p id="trucksInDelivery" class="text-2xl font-semibold text-gray-900">0</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="shrink-0">
+                <div class="bg-yellow-500 rounded-lg p-3 text-white text-2xl">🔧</div>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Disponibles</p>
+                <p id="availableTrucks" class="text-2xl font-semibold text-gray-900">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trucks Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Lista de Camiones</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conductor</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repartos Asignados</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="trucksTableBody" class="bg-white divide-y divide-gray-200">
+                <!-- Trucks will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Add/Edit Truck Modal -->
+    <div id="truckModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Nuevo Camión</h3>
+        </div>
+        <form id="truckForm" class="px-6 py-4 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Conductor *</label>
+            <input type="text" name="nombre" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej: Juan Pérez">
+          </div>
+        </form>
+        
+        <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+          <button id="cancelBtn" type="button" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
+            Cancelar
+          </button>
+          <button id="saveBtn" type="submit" form="truckForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let trucks = [];
+    let repartos = [];
+    let editingTruck = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      await loadData();
+      setupEventListeners();
+    });
+
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+          window.location.href = '/login';
+          return;
+        }
+        
+        document.getElementById('userName').textContent = data.user.nombre_completo;
+      } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.href = '/login';
+      }
+    }
+
+    async function loadData() {
+      try {
+        // Load trucks and repartos in parallel
+        const [trucksResponse, repartosResponse] = await Promise.all([
+          fetch('/api/camiones'),
+          fetch('/api/repartos')
+        ]);
+        
+        const trucksData = await trucksResponse.json();
+        const repartosData = await repartosResponse.json();
+        
+        if (trucksData.success) {
+          trucks = trucksData.data;
+        }
+        
+        if (repartosData.success) {
+          repartos = repartosData.data;
+        }
+        
+        renderTrucks();
+        updateStats();
+        
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('hidden');
+        
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    }
+
+    function updateStats() {
+      const totalTrucks = trucks.length;
+      const trucksInDelivery = new Set(repartos.map(r => r.camion_id)).size;
+      const availableTrucks = totalTrucks - trucksInDelivery;
+      
+      document.getElementById('totalTrucks').textContent = totalTrucks;
+      document.getElementById('trucksInDelivery').textContent = trucksInDelivery;
+      document.getElementById('availableTrucks').textContent = availableTrucks;
+    }
+
+    function renderTrucks() {
+      const tbody = document.getElementById('trucksTableBody');
+      
+      if (trucks.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="px-6 py-8 text-center text-gray-500">No hay camiones registrados</td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = trucks.map(truck => {
+        const truckRepartos = repartos.filter(r => r.camion_id === truck.id);
+        const isInDelivery = truckRepartos.length > 0;
+        
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="text-sm font-medium text-gray-900">#${truck.id}</div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-8 w-8">
+                  <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium text-gray-700">
+                    ${truck.nombre.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+                <div class="ml-3">
+                  <div class="text-sm font-medium text-gray-900">${truck.nombre}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                isInDelivery ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+              }">
+                ${isInDelivery ? 'En Reparto' : 'Disponible'}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-sm text-gray-900">
+                ${truckRepartos.length} repartos activos
+              </div>
+              ${truckRepartos.length > 0 ? 
+                `<div class="text-xs text-gray-500">
+                  Rutas: ${truckRepartos.map(r => r.ruta_nombre).join(', ')}
+                </div>` : 
+                '<div class="text-xs text-gray-400">Sin asignaciones</div>'
+              }
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex space-x-2">
+                <button onclick="editTruck(${truck.id})" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                  Editar
+                </button>
+                <button onclick="deleteTruck(${truck.id})" class="text-red-600 hover:text-red-800 text-sm font-medium" ${isInDelivery ? 'disabled' : ''}>
+                  ${isInDelivery ? 'En uso' : 'Eliminar'}
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function setupEventListeners() {
+      // Modal controls
+      document.getElementById('addTruckBtn').addEventListener('click', () => openModal());
+      document.getElementById('cancelBtn').addEventListener('click', closeModal);
+      document.getElementById('truckForm').addEventListener('submit', saveTruck);
+      
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/login';
+      });
+    }
+
+    function openModal(truck = null) {
+      editingTruck = truck;
+      const modal = document.getElementById('truckModal');
+      const title = document.getElementById('modalTitle');
+      const form = document.getElementById('truckForm');
+      
+      if (truck) {
+        title.textContent = 'Editar Camión';
+        form.querySelector('[name="nombre"]').value = truck.nombre;
+      } else {
+        title.textContent = 'Nuevo Camión';
+        form.reset();
+      }
+      
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('truckModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      editingTruck = null;
+    }
+
+    async function saveTruck(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const truckData = Object.fromEntries(formData.entries());
+      
+      try {
+        const url = editingTruck ? `/api/camiones/${editingTruck.id}` : '/api/camiones';
+        const method = editingTruck ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(truckData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          closeModal();
+          await loadData(); // Reload data
+        } else {
+          alert('Error al guardar camión: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Error saving truck:', error);
+        alert('Error de conexión');
+      }
+    }
+
+    window.editTruck = function(truckId) {
+      const truck = trucks.find(t => t.id === truckId);
+      if (truck) {
+        openModal(truck);
+      }
+    }
+
+    window.deleteTruck = async function(truckId) {
+      const truck = trucks.find(t => t.id === truckId);
+      if (!truck) return;
+      
+      if (confirm(`¿Estás seguro de eliminar el camión de ${truck.nombre}?`)) {
+        try {
+          const response = await fetch(`/api/camiones/${truckId}`, {
+            method: 'DELETE'
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            await loadData(); // Reload data
+          } else {
+            alert('Error al eliminar camión: ' + data.error);
+          }
+        } catch (error) {
+          console.error('Error deleting truck:', error);
+          alert('Error de conexión');
+        }
+      }
+    }
+  </script>
+</Layout>

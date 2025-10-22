@@ -1,0 +1,197 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Dashboard - Sistema de Repartos">
+  <div id="app" class="min-h-screen bg-gray-50">
+    <!-- Loading state -->
+    <div id="loading" class="flex items-center justify-center min-h-screen">
+      <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Main content (hidden initially) -->
+    <div id="mainContent" class="hidden">
+      <!-- Header -->
+      <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Dashboard de Repartos</h1>
+              <p class="text-gray-600">Panel de control del sistema</p>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span id="userName" class="text-gray-700"></span>
+              <button 
+                id="logoutBtn"
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Navigation -->
+      <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex space-x-8">
+            <a href="/dashboard" class="px-3 py-4 text-white border-b-2 border-white font-medium">Dashboard</a>
+            <a href="/clientes" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Clientes</a>
+            <a href="/camiones" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Camiones</a>
+            <a href="/repartos" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Repartos</a>
+            <a href="/mapa" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Mapa</a>
+            <a href="/reportes" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Reportes</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Dashboard Content -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <!-- Stats will be loaded here -->
+        </div>
+
+        <!-- Charts and Tables -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Repartos por Ruta -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Repartos por Ruta</h3>
+            <div id="repartosPorRuta" class="space-y-3">
+              <!-- Chart will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Clientes por Estado -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Estado de Clientes</h3>
+            <div id="clientesEstado" class="space-y-3">
+              <!-- Chart will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Check authentication and load dashboard data
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      await loadDashboardData();
+    });
+
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+          window.location.href = '/login';
+          return;
+        }
+        
+        document.getElementById('userName').textContent = data.user.nombre_completo;
+      } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.href = '/login';
+      }
+    }
+
+    async function loadDashboardData() {
+      try {
+        const response = await fetch('/api/dashboard/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+          renderStats(data.data);
+          renderCharts(data.data);
+        }
+        
+        // Show main content and hide loading
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('hidden');
+        
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+
+    function renderStats(stats) {
+      const statsContainer = document.getElementById('statsContainer');
+      
+      const statCards = [
+        { title: 'Total Clientes', value: stats.totalClientes, icon: '👥', color: 'bg-blue-500' },
+        { title: 'Total Camiones', value: stats.totalCamiones, icon: '🚛', color: 'bg-green-500' },
+        { title: 'Total Rutas', value: stats.totalRutas, icon: '🛣️', color: 'bg-yellow-500' },
+        { title: 'Total Repartos', value: stats.totalRepartos, icon: '📦', color: 'bg-purple-500' }
+      ];
+      
+      statsContainer.innerHTML = statCards.map(stat => `
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="${stat.color} rounded-lg p-3 text-white text-2xl">
+                ${stat.icon}
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 truncate">${stat.title}</p>
+              <p class="text-2xl font-semibold text-gray-900">${stat.value}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderCharts(stats) {
+      // Render repartos por ruta
+      const repartosContainer = document.getElementById('repartosPorRuta');
+      repartosContainer.innerHTML = stats.repartosPorRuta.map(item => {
+        const percentage = stats.totalRepartos > 0 ? (item.total_repartos / stats.totalRepartos) * 100 : 0;
+        return `
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-700">${item.ruta}</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-24 bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+              </div>
+              <span class="text-sm text-gray-600">${item.total_repartos}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render clientes por estado
+      const clientesContainer = document.getElementById('clientesEstado');
+      clientesContainer.innerHTML = stats.clientesPorEstado.map(item => {
+        const total = stats.clientesPorEstado.reduce((acc, curr) => acc + parseInt(curr.total), 0);
+        const percentage = total > 0 ? (item.total / total) * 100 : 0;
+        const color = item.estado === 'Activo' ? 'bg-green-600' : 'bg-red-600';
+        
+        return `
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-700">${item.estado}</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-24 bg-gray-200 rounded-full h-2">
+                <div class="${color} h-2 rounded-full" style="width: ${percentage}%"></div>
+              </div>
+              <span class="text-sm text-gray-600">${item.total}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/login';
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    });
+  </script>
+</Layout>

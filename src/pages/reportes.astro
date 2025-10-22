@@ -1,0 +1,524 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Reportes y Análisis - Sistema de Repartos">
+  <div id="app" class="min-h-screen bg-gray-50">
+    <!-- Loading state -->
+    <div id="loading" class="flex items-center justify-center min-h-screen">
+      <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Main content -->
+    <div id="mainContent" class="hidden">
+      <!-- Header -->
+      <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Reportes y Análisis</h1>
+              <p class="text-gray-600">Estadísticas y análisis del sistema</p>
+            </div>
+            <div class="flex items-center space-x-4">
+              <button 
+                id="exportBtn"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                📊 Exportar Reporte
+              </button>
+              <span id="userName" class="text-gray-700"></span>
+              <button 
+                id="logoutBtn"
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Navigation -->
+      <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex space-x-8">
+            <a href="/dashboard" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Dashboard</a>
+            <a href="/clientes" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Clientes</a>
+            <a href="/camiones" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Camiones</a>
+            <a href="/repartos" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Repartos</a>
+            <a href="/mapa" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Mapa</a>
+            <a href="/reportes" class="px-3 py-4 text-white border-b-2 border-white font-medium">Reportes</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Report Type Selector -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Seleccionar Tipo de Reporte</h3>
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <button id="reportGeneral" class="report-btn px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              📊 General
+            </button>
+            <button id="reportRepartos" class="report-btn px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              🚛 Repartos
+            </button>
+            <button id="reportClientes" class="report-btn px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+              👥 Clientes
+            </button>
+            <button id="reportRutas" class="report-btn px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+              🛣️ Rutas
+            </button>
+            <button id="reportEficiencia" class="report-btn px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+              ⚡ Eficiencia
+            </button>
+          </div>
+        </div>
+
+        <!-- Report Content -->
+        <div id="reportContent">
+          <!-- Content will be loaded dynamically -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    let currentReportType = 'general';
+    let currentReportData = {};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      await loadReport('general');
+      setupEventListeners();
+    });
+
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+          window.location.href = '/login';
+          return;
+        }
+        
+        document.getElementById('userName').textContent = data.user.nombre_completo;
+      } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.href = '/login';
+      }
+    }
+
+    async function loadReport(tipo) {
+      try {
+        showLoading();
+        
+        const response = await fetch(`/api/reportes?tipo=${tipo}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          currentReportType = tipo;
+          currentReportData = data.data;
+          renderReport(tipo, data.data);
+        }
+        
+        hideLoading();
+        
+      } catch (error) {
+        console.error('Error loading report:', error);
+        hideLoading();
+      }
+    }
+
+    function showLoading() {
+      document.getElementById('reportContent').innerHTML = `
+        <div class="flex items-center justify-center py-12">
+          <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+          <span class="ml-3 text-lg text-gray-600">Generando reporte...</span>
+        </div>
+      `;
+    }
+
+    function hideLoading() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('mainContent').classList.remove('hidden');
+    }
+
+    function renderReport(tipo, data) {
+      const container = document.getElementById('reportContent');
+      
+      switch (tipo) {
+        case 'general':
+          container.innerHTML = renderGeneralReport(data);
+          break;
+        case 'repartos':
+          container.innerHTML = renderRepartosReport(data);
+          break;
+        case 'clientes':
+          container.innerHTML = renderClientesReport(data);
+          break;
+        case 'rutas':
+          container.innerHTML = renderRutasReport(data);
+          break;
+        case 'eficiencia':
+          container.innerHTML = renderEficienciaReport(data);
+          break;
+      }
+    }
+
+    function renderGeneralReport(data) {
+      return `
+        <div class="space-y-6">
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="bg-white rounded-lg shadow p-4">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-green-600">${data.totales.total_clientes_activos}</div>
+                <div class="text-sm text-gray-600">Clientes Activos</div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600">${data.totales.total_camiones}</div>
+                <div class="text-sm text-gray-600">Camiones</div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600">${data.totales.total_rutas}</div>
+                <div class="text-sm text-gray-600">Rutas</div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-yellow-600">${data.totales.total_repartos}</div>
+                <div class="text-sm text-gray-600">Repartos</div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-red-600">${data.totales.total_clientes_inactivos}</div>
+                <div class="text-sm text-gray-600">Clientes Inactivos</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Clientes por Ruta -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Clientes por Ruta</h3>
+              <div class="space-y-3">
+                ${data.clientesPorRuta.map(item => {
+                  const total = data.clientesPorRuta.reduce((acc, curr) => acc + parseInt(curr.total_clientes), 0);
+                  const percentage = total > 0 ? (item.total_clientes / total) * 100 : 0;
+                  return `
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm font-medium text-gray-700">${item.ruta}</span>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-32 bg-gray-200 rounded-full h-2">
+                          <div class="bg-blue-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="text-sm text-gray-600 w-8">${item.total_clientes}</span>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Utilización de Camiones -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Utilización de Camiones</h3>
+              <div class="space-y-3">
+                ${data.utilizacionCamiones.map(item => {
+                  const maxRepartos = Math.max(...data.utilizacionCamiones.map(c => parseInt(c.total_repartos)));
+                  const percentage = maxRepartos > 0 ? (item.total_repartos / maxRepartos) * 100 : 0;
+                  return `
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">${item.camion}</span>
+                        <div class="text-xs text-gray-500">${item.rutas_diferentes} rutas diferentes</div>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-24 bg-gray-200 rounded-full h-2">
+                          <div class="bg-green-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="text-sm text-gray-600 w-8">${item.total_repartos}</span>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRepartosReport(data) {
+      return `
+        <div class="space-y-6">
+          <!-- Repartos Activos -->
+          <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-gray-900">Repartos Activos</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ruta</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Camión</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clientes</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  ${data.repartosActivos.map(reparto => `
+                    <tr>
+                      <td class="px-6 py-4 text-sm text-gray-900">#${reparto.id}</td>
+                      <td class="px-6 py-4 text-sm text-gray-900">${reparto.ruta || 'Sin asignar'}</td>
+                      <td class="px-6 py-4 text-sm text-gray-900">${reparto.camion || 'Sin asignar'}</td>
+                      <td class="px-6 py-4 text-sm text-gray-900">${reparto.total_clientes} clientes</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Distribución por Rutas -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Distribución por Rutas</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${data.distribucionRutas.map(ruta => `
+                <div class="border rounded-lg p-4">
+                  <h4 class="font-medium text-gray-900">${ruta.ruta}</h4>
+                  <div class="mt-2 space-y-1">
+                    <div class="text-sm text-gray-600">Repartos: ${ruta.total_repartos}</div>
+                    <div class="text-sm text-gray-600">Promedio clientes: ${parseFloat(ruta.promedio_clientes || 0).toFixed(1)}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderClientesReport(data) {
+      return `
+        <div class="space-y-6">
+          <!-- Distribución por Estado -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Distribución por Estado</h3>
+              <div class="space-y-3">
+                ${data.estadoDistribucion.map(item => `
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-700">${item.estado}</span>
+                    <div class="flex items-center space-x-2">
+                      <div class="w-24 bg-gray-200 rounded-full h-2">
+                        <div class="h-2 rounded-full ${item.estado === 'Activo' ? 'bg-green-600' : 'bg-red-600'}" style="width: ${item.porcentaje}%"></div>
+                      </div>
+                      <span class="text-sm text-gray-600">${item.total} (${item.porcentaje}%)</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Coordenadas GPS</h3>
+              <div class="space-y-3">
+                ${data.coordenadasStats.map(item => `
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-700">${item.tipo_coordenadas}</span>
+                    <div class="flex items-center space-x-2">
+                      <div class="w-24 bg-gray-200 rounded-full h-2">
+                        <div class="h-2 rounded-full ${item.tipo_coordenadas === 'Con GPS' ? 'bg-blue-600' : 'bg-gray-400'}" style="width: ${(item.total / data.coordenadasStats.reduce((acc, curr) => acc + parseInt(curr.total), 0)) * 100}%"></div>
+                      </div>
+                      <span class="text-sm text-gray-600">${item.total}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Clientes -->
+          <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-gray-900">Top 10 Clientes por Frecuencia</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Razón Social</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Repartos</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  ${data.topClientes.map((cliente, index) => `
+                    <tr>
+                      <td class="px-6 py-4">
+                        <div class="flex items-center">
+                          <div class="shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-700">
+                            ${index + 1}
+                          </div>
+                          <div class="ml-3">
+                            <div class="text-sm font-medium text-gray-900">${cliente.nombre}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-900">${cliente.razonsocial}</td>
+                      <td class="px-6 py-4 text-sm text-gray-900">${cliente.total_repartos}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRutasReport(data) {
+      return `
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Análisis de Rutas</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ruta</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Repartos</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Camiones Diferentes</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clientes Únicos</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Promedio Clientes/Reparto</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                ${data.analisisRutas.map(ruta => `
+                  <tr>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${ruta.ruta}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${ruta.total_repartos}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${ruta.camiones_diferentes}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${ruta.clientes_unicos}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${parseFloat(ruta.promedio_clientes_por_reparto || 0).toFixed(1)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderEficienciaReport(data) {
+      return `
+        <div class="space-y-6">
+          <!-- KPIs -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+              <div class="text-3xl font-bold text-blue-600">${data.kpis.promedio_clientes_por_reparto}</div>
+              <div class="text-sm text-gray-600">Promedio Clientes/Reparto</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+              <div class="text-3xl font-bold text-green-600">${data.kpis.camiones_activos}</div>
+              <div class="text-sm text-gray-600">Camiones Activos</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+              <div class="text-3xl font-bold text-purple-600">${data.kpis.rutas_activas}</div>
+              <div class="text-sm text-gray-600">Rutas Activas</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+              <div class="text-3xl font-bold text-yellow-600">${data.kpis.clientes_en_repartos}</div>
+              <div class="text-sm text-gray-600">Clientes en Repartos</div>
+            </div>
+          </div>
+
+          <!-- Eficiencia de Camiones -->
+          <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-gray-900">Eficiencia de Camiones</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Camión</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Repartos</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rutas Cubiertas</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clientes Servidos</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Eficiencia</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  ${data.eficienciaCamiones.map(camion => {
+                    const eficiencia = parseFloat(camion.promedio_clientes_por_reparto);
+                    const eficienciaClass = eficiencia >= 3 ? 'text-green-600' : eficiencia >= 2 ? 'text-yellow-600' : 'text-red-600';
+                    return `
+                      <tr>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${camion.camion}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">${camion.total_repartos}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">${camion.rutas_cubiertas}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">${camion.total_clientes_servidos}</td>
+                        <td class="px-6 py-4 text-sm font-medium ${eficienciaClass}">${eficiencia} clientes/reparto</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setupEventListeners() {
+      // Report type buttons
+      document.getElementById('reportGeneral').addEventListener('click', () => loadReport('general'));
+      document.getElementById('reportRepartos').addEventListener('click', () => loadReport('repartos'));
+      document.getElementById('reportClientes').addEventListener('click', () => loadReport('clientes'));
+      document.getElementById('reportRutas').addEventListener('click', () => loadReport('rutas'));
+      document.getElementById('reportEficiencia').addEventListener('click', () => loadReport('eficiencia'));
+      
+      // Export button
+      document.getElementById('exportBtn').addEventListener('click', exportReport);
+      
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/login';
+      });
+    }
+
+    function exportReport() {
+      // Create a simple text export
+      let exportContent = `REPORTE DEL SISTEMA DE REPARTOS\n`;
+      exportContent += `Tipo: ${currentReportType.toUpperCase()}\n`;
+      exportContent += `Fecha: ${new Date().toLocaleDateString()}\n`;
+      exportContent += `\n` + '='.repeat(50) + `\n\n`;
+      
+      // Add report data as JSON for now (could be enhanced to create proper CSV/PDF)
+      exportContent += JSON.stringify(currentReportData, null, 2);
+      
+      // Create and download file
+      const blob = new Blob([exportContent], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `reporte_${currentReportType}_${new Date().toISOString().split('T')[0]}.txt`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  </script>
+</Layout>
