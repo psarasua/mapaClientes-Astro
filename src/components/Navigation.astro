@@ -1,0 +1,129 @@
+---
+interface Props {
+  currentPage: string;
+  userName?: string;
+}
+
+const { currentPage, userName } = Astro.props;
+
+const navItems = [
+  { 
+    href: '/dashboard', 
+    label: 'Dashboard',
+    icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>`
+  },
+  { 
+    href: '/clientes', 
+    label: 'Clientes',
+    icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>`
+  },
+  { 
+    href: '/camiones', 
+    label: 'Camiones',
+    icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"></path>
+          </svg>`
+  },
+  { 
+    href: '/repartos', 
+    label: 'Repartos',
+    icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+          </svg>`
+  },
+  { 
+    href: '/mapa', 
+    label: 'Mapa',
+    icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+          </svg>`
+  },
+  { 
+    href: '/reportes', 
+    label: 'Reportes',
+    icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>`
+  }
+];
+---
+
+<!-- Header moderno -->
+<header class="bg-white shadow-sm border-b border-gray-200">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="flex justify-between items-center py-6">
+      <div class="flex items-center space-x-4">
+        <div class="w-10 h-10 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900" style="font-family: Inter;">
+            {currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}
+          </h1>
+          <p class="text-gray-600 text-sm">Sistema de Gestión de Repartos</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="hidden md:flex items-center space-x-3">
+          <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+          </div>
+          <span id="userName" class="text-gray-700 font-medium text-sm">{userName}</span>
+        </div>
+        <button 
+          id="logoutBtn"
+          class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm flex items-center space-x-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          <span>Salir</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Navigation moderna -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-10">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="flex space-x-8">
+      {navItems.map(item => (
+        <a 
+          href={item.href} 
+          class={`px-4 py-4 text-sm font-medium transition-all duration-200 border-b-2 ${
+            currentPage === item.label.toLowerCase() 
+              ? 'text-blue-600 border-blue-600 font-semibold' 
+              : 'text-gray-600 hover:text-blue-600 border-transparent hover:border-blue-600'
+          }`}
+        >
+          <span class="flex items-center space-x-2">
+            <Fragment set:html={item.icon} />
+            <span>{item.label}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Setup logout functionality
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Error during logout:', error);
+      window.location.href = '/login';
+    }
+  });
+</script>

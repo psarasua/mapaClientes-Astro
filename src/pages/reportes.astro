@@ -1,54 +1,162 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
 ---
 
 <Layout title="Reportes y Análisis - Sistema de Repartos">
   <div id="app" class="min-h-screen bg-gray-50">
     <!-- Loading state -->
     <div id="loading" class="flex items-center justify-center min-h-screen">
-      <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div class="flex flex-col items-center space-y-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p class="text-gray-600 font-medium">Generando reportes...</p>
+      </div>
     </div>
 
     <!-- Main content -->
     <div id="mainContent" class="hidden">
-      <!-- Header -->
-      <header class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between items-center py-4">
-            <div>
-              <h1 class="text-2xl font-bold text-gray-900">Reportes y Análisis</h1>
-              <p class="text-gray-600">Estadísticas y análisis del sistema</p>
+      <Navigation currentPage="reportes" />
+
+      <!-- Content -->
+      <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        <!-- Header de página -->
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-900" style="font-family: Inter;">Reportes y Análisis</h2>
+            <p class="text-gray-600 mt-2">Estadísticas detalladas y análisis del rendimiento</p>
+          </div>
+          <div class="flex space-x-3">
+            <button 
+              id="refreshReports"
+              class="btn-outline"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Actualizar
+            </button>
+            <button 
+              id="exportBtn"
+              class="btn-secondary"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Exportar Reporte
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de tipo de reporte -->
+        <div class="card mb-8">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex-1">
+              <label for="reportType" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Reporte</label>
+              <select id="reportType" class="input-field">
+                <option value="general">Reporte General</option>
+                <option value="repartos">Análisis de Repartos</option>
+                <option value="clientes">Estadísticas de Clientes</option>
+                <option value="rutas">Rendimiento de Rutas</option>
+                <option value="eficiencia">Análisis de Eficiencia</option>
+              </select>
             </div>
             <div class="flex items-center space-x-4">
-              <button 
-                id="exportBtn"
-                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                📊 Exportar Reporte
-              </button>
-              <span id="userName" class="text-gray-700"></span>
-              <button 
-                id="logoutBtn"
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Cerrar Sesión
+              <div>
+                <label for="dateFrom" class="block text-sm font-medium text-gray-700 mb-2">Desde</label>
+                <input type="date" id="dateFrom" class="input-field">
+              </div>
+              <div>
+                <label for="dateTo" class="block text-sm font-medium text-gray-700 mb-2">Hasta</label>
+                <input type="date" id="dateTo" class="input-field">
+              </div>
+              <button id="generateReport" class="btn-primary mt-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Generar
               </button>
             </div>
           </div>
         </div>
-      </header>
 
-      <!-- Navigation -->
-      <nav class="bg-blue-600 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex space-x-8">
-            <a href="/dashboard" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Dashboard</a>
-            <a href="/clientes" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Clientes</a>
-            <a href="/camiones" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Camiones</a>
-            <a href="/repartos" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Repartos</a>
-            <a href="/mapa" class="px-3 py-4 text-blue-100 hover:text-white hover:border-blue-300 border-b-2 border-transparent transition-colors">Mapa</a>
-            <a href="/reportes" class="px-3 py-4 text-white border-b-2 border-white font-medium">Reportes</a>
+        <!-- Métricas rápidas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 mb-1">Repartos del Mes</p>
+                <p id="repartosDelMes" class="text-2xl font-bold text-blue-600" style="font-family: Inter;">0</p>
+              </div>
+              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+              </div>
+            </div>
           </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 mb-1">Eficiencia Promedio</p>
+                <p id="eficienciaPromedio" class="text-2xl font-bold text-green-600" style="font-family: Inter;">0%</p>
+              </div>
+              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 mb-1">Clientes Activos</p>
+                <p id="clientesActivos" class="text-2xl font-bold text-orange-600" style="font-family: Inter;">0</p>
+              </div>
+              <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 mb-1">Tiempo Promedio</p>
+                <p id="tiempoPromedio" class="text-2xl font-bold text-purple-600" style="font-family: Inter;">0h</p>
+              </div>
+              <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido del reporte -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-6">
+            <h3 id="reportTitle" class="text-xl font-semibold text-gray-900" style="font-family: Inter;">Reporte General</h3>
+            <div class="text-sm text-gray-500">
+              Última actualización: <span id="lastUpdate">--</span>
+            </div>
+          </div>
+          
+          <div id="reportContent" class="space-y-6">
+            <!-- Report content will be loaded here -->
+            <div class="text-center py-12">
+              <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <p class="text-gray-600">Selecciona un tipo de reporte y haz clic en "Generar" para ver los datos</p>
+            </div>
+          </div>
+        </div>
         </div>
       </nav>
 

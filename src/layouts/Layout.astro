@@ -10,17 +10,214 @@ const { title } = Astro.props;
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Proyecto Astro con Tailwind CSS" />
+    <meta name="description" content="Sistema de Gestión de Repartos - Administra tu flota y rutas de entrega de manera eficiente" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    
+    <!-- Fuentes modernas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Meta tags adicionales -->
+    <meta name="theme-color" content="#4A90E2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
     <title>{title}</title>
   </head>
-  <body>
+  <body class="font-inter antialiased bg-gray-50 text-gray-900">
     <slot />
   </body>
 </html>
 
 <style is:global>
   @import '../styles/global.css';
+  
+  /* Variables CSS para el sistema de diseño */
+  :root {
+    --color-primary: #4A90E2;
+    --color-primary-hover: #357ABD;
+    --color-primary-light: #E3F2FD;
+    --color-secondary: #34C759;
+    --color-secondary-hover: #28A745;
+    --color-alert: #FF6B35;
+    --color-alert-hover: #E55A2B;
+    --color-background: #FFFFFF;
+    --color-surface: #F9FAFB;
+    --color-text-primary: #333333;
+    --color-text-secondary: #6B7280;
+    --color-text-tertiary: #9CA3AF;
+    --color-border: #E5E7EB;
+    --color-border-light: #F3F4F6;
+    
+    /* Sombras del sistema */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Espaciado del sistema */
+    --spacing-xs: 0.25rem;  /* 4px */
+    --spacing-sm: 0.5rem;   /* 8px */
+    --spacing-md: 1rem;     /* 16px */
+    --spacing-lg: 1.5rem;   /* 24px */
+    --spacing-xl: 2rem;     /* 32px */
+    --spacing-2xl: 3rem;    /* 48px */
+    
+    /* Bordes redondeados */
+    --radius-sm: 0.375rem;  /* 6px */
+    --radius-md: 0.75rem;   /* 12px */
+    --radius-lg: 1rem;      /* 16px */
+    --radius-xl: 1.5rem;    /* 24px */
+  }
+  
+  /* Configuración base de la tipografía */
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background-color: var(--color-surface);
+  }
+  
+  /* Clases utilitarias personalizadas */
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+  
+  .btn-secondary {
+    background-color: var(--color-secondary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--color-secondary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    color: var(--color-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 16px;
+    border: 2px solid var(--color-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-outline:hover {
+    background-color: var(--color-primary);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .card {
+    background-color: var(--color-background);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border-light);
+    padding: var(--spacing-lg);
+    transition: all 0.2s ease;
+  }
+  
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  
+  .input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    transition: all 0.2s ease;
+    background-color: var(--color-surface);
+  }
+  
+  .input-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: var(--color-background);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  }
+  
+  /* Animaciones suaves globales */
+  * {
+    transition: all 0.15s ease;
+  }
+  
+  /* Mejoras de accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  /* Scrollbar personalizado */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--color-surface);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary);
+  }
 </style>
