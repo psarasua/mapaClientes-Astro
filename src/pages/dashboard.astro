@@ -1,8 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import MotionSimple from '../components/MotionSimple.astro';
 ---
 
 <Layout title="Dashboard - Sistema de Repartos">
+  <MotionSimple />
   <div id="app" class="min-h-screen bg-gray-50">
     <!-- Loading state -->
     <div id="loading" class="flex items-center justify-center min-h-screen">
@@ -110,18 +112,18 @@ import Layout from '../layouts/Layout.astro';
 
       <!-- Dashboard Content -->
       <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        <!-- Stats Cards modernas -->
-        <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Stats Cards modernas con animaciones -->
+        <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 motion-stagger-children" data-motion="fade-up" data-delay="200">
           <!-- Stats will be loaded here -->
         </div>
 
-        <!-- Charts and Tables modernos -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Charts and Tables modernos con animaciones -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 motion-stagger-children" data-motion="fade-up" data-delay="400">
           <!-- Repartos por Ruta -->
-          <div class="card">
+          <div class="card motion-hover-lift" data-motion="fade-right" data-delay="0">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-xl font-semibold text-gray-900" style="font-family: Inter;">Repartos por Ruta</h3>
-              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center motion-hover-scale">
                 <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
@@ -133,10 +135,10 @@ import Layout from '../layouts/Layout.astro';
           </div>
 
           <!-- Clientes por Estado -->
-          <div class="card">
+          <div class="card motion-hover-lift" data-motion="fade-left" data-delay="200">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-xl font-semibold text-gray-900" style="font-family: Inter;">Estado de Clientes</h3>
-              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center motion-hover-scale">
                 <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
@@ -148,13 +150,13 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </div>
 
-        <!-- Acciones rápidas -->
-        <div class="mt-8">
+        <!-- Acciones rápidas con animaciones -->
+        <div class="mt-8" data-motion="fade-up" data-delay="600">
           <h2 class="text-2xl font-bold text-gray-900 mb-6" style="font-family: Inter;">Acciones Rápidas</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <a href="/clientes" class="card group hover:shadow-lg transition-all duration-200">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 motion-stagger-children">
+            <a href="/clientes" class="card group motion-hover-lift motion-hover-scale-95" data-motion="fade-up" data-delay="0">
               <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors motion-hover-scale">
                   <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                   </svg>
@@ -166,9 +168,9 @@ import Layout from '../layouts/Layout.astro';
               </div>
             </a>
 
-            <a href="/camiones" class="card group hover:shadow-lg transition-all duration-200">
+            <a href="/camiones" class="card group motion-hover-lift motion-hover-scale-95" data-motion="fade-up" data-delay="100">
               <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors motion-hover-scale">
                   <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"></path>
                   </svg>
@@ -180,9 +182,9 @@ import Layout from '../layouts/Layout.astro';
               </div>
             </a>
 
-            <a href="/repartos" class="card group hover:shadow-lg transition-all duration-200">
+            <a href="/repartos" class="card group motion-hover-lift motion-hover-scale-95" data-motion="fade-up" data-delay="200">
               <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center group-hover:bg-orange-200 transition-colors motion-hover-scale">
                   <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
                   </svg>
@@ -194,9 +196,9 @@ import Layout from '../layouts/Layout.astro';
               </div>
             </a>
 
-            <a href="/reportes" class="card group hover:shadow-lg transition-all duration-200">
+            <a href="/reportes" class="card group motion-hover-lift motion-hover-scale-95" data-motion="fade-up" data-delay="300">
               <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors motion-hover-scale">
                   <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
@@ -302,8 +304,8 @@ import Layout from '../layouts/Layout.astro';
         }
       ];
       
-      statsContainer.innerHTML = statCards.map(stat => `
-        <div class="card group hover:shadow-lg transition-all duration-200">
+      statsContainer.innerHTML = statCards.map((stat, index) => `
+        <div class="card group motion-hover-lift motion-hover-scale-95" data-motion="fade-up" data-delay="${index * 100}">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-linear-to-br ${stat.colors} rounded-xl flex items-center justify-center shadow-lg">
@@ -314,7 +316,7 @@ import Layout from '../layouts/Layout.astro';
                 <p class="text-2xl font-bold text-gray-900" style="font-family: Inter;">${stat.value}</p>
               </div>
             </div>
-            <div class="w-8 h-8 ${stat.bgColor} rounded-lg flex items-center justify-center">
+            <div class="w-8 h-8 ${stat.bgColor} rounded-lg flex items-center justify-center motion-hover-scale">
               <svg class="w-4 h-4 ${stat.textColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17H7V7"></path>
               </svg>
@@ -327,14 +329,14 @@ import Layout from '../layouts/Layout.astro';
     function renderCharts(stats) {
       // Render repartos por ruta
       const repartosContainer = document.getElementById('repartosPorRuta');
-      repartosContainer.innerHTML = stats.repartosPorRuta.map(item => {
+      repartosContainer.innerHTML = stats.repartosPorRuta.map((item, index) => {
         const percentage = stats.totalRepartos > 0 ? (item.total_repartos / stats.totalRepartos) * 100 : 0;
         return `
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between motion-hover-scale-95" data-motion="fade-left" data-delay="${index * 100}">
             <span class="text-sm font-medium text-gray-700">${item.ruta}</span>
             <div class="flex items-center space-x-2">
-              <div class="w-24 bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+              <div class="w-24 bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div class="bg-blue-600 h-2 rounded-full motion-progress-bar" style="width: 0%; animation-delay: ${(index * 100) + 500}ms" data-width="${percentage}%"></div>
               </div>
               <span class="text-sm text-gray-600">${item.total_repartos}</span>
             </div>
@@ -344,23 +346,33 @@ import Layout from '../layouts/Layout.astro';
 
       // Render clientes por estado
       const clientesContainer = document.getElementById('clientesEstado');
-      clientesContainer.innerHTML = stats.clientesPorEstado.map(item => {
+      clientesContainer.innerHTML = stats.clientesPorEstado.map((item, index) => {
         const total = stats.clientesPorEstado.reduce((acc, curr) => acc + parseInt(curr.total), 0);
         const percentage = total > 0 ? (item.total / total) * 100 : 0;
         const color = item.estado === 'Activo' ? 'bg-green-600' : 'bg-red-600';
         
         return `
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between motion-hover-scale-95" data-motion="fade-right" data-delay="${index * 100}">
             <span class="text-sm font-medium text-gray-700">${item.estado}</span>
             <div class="flex items-center space-x-2">
-              <div class="w-24 bg-gray-200 rounded-full h-2">
-                <div class="${color} h-2 rounded-full" style="width: ${percentage}%"></div>
+              <div class="w-24 bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div class="${color} h-2 rounded-full motion-progress-bar" style="width: 0%; animation-delay: ${(index * 100) + 700}ms" data-width="${percentage}%"></div>
               </div>
               <span class="text-sm text-gray-600">${item.total}</span>
             </div>
           </div>
         `;
       }).join('');
+
+      // Activar animaciones de barras de progreso después de renderizar
+      setTimeout(() => {
+        document.querySelectorAll('.motion-progress-bar').forEach(bar => {
+          const targetWidth = bar.getAttribute('data-width');
+          if (targetWidth) {
+            bar.style.width = targetWidth;
+          }
+        });
+      }, 100);
     }
 
     // Logout functionality

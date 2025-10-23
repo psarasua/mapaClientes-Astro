@@ -1,14 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import MotionSimple from '../components/MotionSimple.astro';
 ---
 
 <Layout title="Login - Sistema de Repartos">
+  <MotionSimple />
   <main class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-    <!-- Contenedor principal -->
-    <div class="w-full max-w-md">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-6">
+    <!-- Contenedor principal con animación -->
+    <div class="w-full max-w-md" data-motion="fade-up" data-delay="0">
+      <!-- Header con animación -->
+      <div class="text-center mb-8" data-motion="scale-up" data-delay="200">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-6 motion-hover-scale">
           <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"></path>
           </svg>
@@ -19,11 +21,11 @@ import Layout from '../layouts/Layout.astro';
         <p class="text-gray-600 text-base">Inicia sesión en tu cuenta para continuar</p>
       </div>
 
-      <!-- Tarjeta de login -->
-      <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+      <!-- Tarjeta de login con animación -->
+      <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 motion-hover-lift" data-motion="fade-up" data-delay="400">
         <form id="loginForm" class="space-y-6">
-          <!-- Campo Email/Usuario -->
-          <div class="space-y-2">
+          <!-- Campo Email/Usuario con animación -->
+          <div class="space-y-2" data-motion="fade-right" data-delay="600">
             <label for="username" class="block text-sm font-medium text-gray-700">
               Email o Usuario
             </label>

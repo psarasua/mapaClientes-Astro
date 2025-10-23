@@ -1,0 +1,167 @@
+---
+// Motion Animation System - Simple & Effective
+---
+
+<script>
+  // Initialize motion system when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    initMotionSystem();
+  });
+
+  function initMotionSystem() {
+    // Add styles for motion animations
+    addMotionStyles();
+    
+    // Set up intersection observer for scroll animations
+    setupScrollAnimations();
+    
+    // Add progress bar animations
+    setupProgressAnimations();
+  }
+
+  function addMotionStyles() {
+    if (document.getElementById('motion-system-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'motion-system-styles';
+    style.textContent = `
+      /* Base motion styles */
+      [data-motion] {
+        opacity: 0;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      [data-motion].motion-visible {
+        opacity: 1;
+      }
+
+      /* Fade animations */
+      [data-motion="fade-up"] {
+        transform: translateY(30px);
+      }
+      [data-motion="fade-up"].motion-visible {
+        transform: translateY(0);
+      }
+
+      [data-motion="fade-down"] {
+        transform: translateY(-30px);
+      }
+      [data-motion="fade-down"].motion-visible {
+        transform: translateY(0);
+      }
+
+      [data-motion="fade-left"] {
+        transform: translateX(-30px);
+      }
+      [data-motion="fade-left"].motion-visible {
+        transform: translateX(0);
+      }
+
+      [data-motion="fade-right"] {
+        transform: translateX(30px);
+      }
+      [data-motion="fade-right"].motion-visible {
+        transform: translateX(0);
+      }
+
+      /* Scale animations */
+      [data-motion="scale-up"] {
+        transform: scale(0.8);
+      }
+      [data-motion="scale-up"].motion-visible {
+        transform: scale(1);
+      }
+
+      /* Hover effects */
+      .motion-hover-scale {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .motion-hover-scale:hover {
+        transform: scale(1.05);
+      }
+
+      .motion-hover-scale-95 {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .motion-hover-scale-95:hover {
+        transform: scale(0.98);
+      }
+
+      .motion-hover-lift {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .motion-hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      /* Progress bars */
+      .motion-progress-bar {
+        transition: width 1s ease-out;
+        will-change: width;
+      }
+
+      /* Stagger children */
+      .motion-stagger-children > * {
+        transition-delay: calc(var(--stagger-index, 0) * 100ms);
+      }
+    `;
+    
+    document.head.appendChild(style);
+  }
+
+  function setupScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const element = entry.target;
+          const delay = element.getAttribute('data-delay') || 0;
+          
+          setTimeout(() => {
+            element.classList.add('motion-visible');
+          }, parseInt(delay));
+          
+          observer.unobserve(element);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '50px'
+    });
+
+    // Observe all elements with data-motion
+    document.querySelectorAll('[data-motion]').forEach(el => {
+      observer.observe(el);
+    });
+  }
+
+  function setupProgressAnimations() {
+    // Animate progress bars after a short delay
+    setTimeout(() => {
+      document.querySelectorAll('.motion-progress-bar[data-width]').forEach(bar => {
+        const targetWidth = bar.getAttribute('data-width');
+        if (targetWidth) {
+          bar.style.width = targetWidth;
+        }
+      });
+    }, 500);
+  }
+</script>
+
+<style>
+  /* Additional motion styles can go here */
+  .motion-fade-in {
+    animation: motionFadeIn 0.6s ease-out forwards;
+  }
+
+  @keyframes motionFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

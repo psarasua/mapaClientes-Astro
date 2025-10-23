@@ -1,9 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
+import MotionSimple from '../components/MotionSimple.astro';
 ---
 
 <Layout title="Gestión de Clientes - Sistema de Repartos">
+  <MotionSimple />
   <div id="app" class="min-h-screen bg-gray-50">
     <!-- Loading state -->
     <div id="loading" class="flex items-center justify-center min-h-screen">
@@ -19,15 +21,16 @@ import Navigation from '../components/Navigation.astro';
 
       <!-- Content -->
       <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        <!-- Header de página -->
-        <div class="flex justify-between items-center mb-8">
-          <div>
+        <!-- Header de página con animación -->
+        <div class="flex justify-between items-center mb-8" data-motion="fade-up" data-delay="0">
+          <div data-motion="fade-right" data-delay="100">
             <h2 class="text-3xl font-bold text-gray-900" style="font-family: Inter;">Gestión de Clientes</h2>
             <p class="text-gray-600 mt-2">Administra tu cartera de clientes y sus ubicaciones</p>
           </div>
           <button 
             id="addClientBtn"
-            class="btn-primary"
+            class="btn-primary motion-hover-scale"
+            data-motion="fade-left" data-delay="200"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -36,10 +39,10 @@ import Navigation from '../components/Navigation.astro';
           </button>
         </div>
 
-        <!-- Filtros y búsqueda -->
-        <div class="card mb-8">
+        <!-- Filtros y búsqueda con animación -->
+        <div class="card mb-8" data-motion="fade-up" data-delay="300">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="flex-1 max-w-md">
+            <div class="flex-1 max-w-md" data-motion="fade-right" data-delay="400">
               <label for="searchClients" class="sr-only">Buscar clientes</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -55,13 +58,13 @@ import Navigation from '../components/Navigation.astro';
                 />
               </div>
             </div>
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3" data-motion="fade-left" data-delay="500">
               <select id="filterEstado" class="input-field">
                 <option value="">Todos los estados</option>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
               </select>
-              <button id="refreshBtn" class="btn-outline">
+              <button id="refreshBtn" class="btn-outline motion-hover-scale">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
@@ -71,8 +74,8 @@ import Navigation from '../components/Navigation.astro';
           </div>
         </div>
 
-        <!-- Lista de clientes -->
-        <div class="card">
+        <!-- Lista de clientes con animación -->
+        <div class="card motion-hover-lift" data-motion="fade-up" data-delay="600">
           <div class="overflow-hidden">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
