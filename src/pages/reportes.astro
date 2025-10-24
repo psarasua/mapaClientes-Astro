@@ -4,14 +4,14 @@ import Navigation from '../components/Navigation.astro';
 import MotionSimple from '../components/MotionSimple.astro';
 ---
 
-<Layout title="Reportes y Análisis - Sistema de Repartos">
+<Layout title="Reportes - Sistema de Repartos">
   <MotionSimple />
   <div id="app" class="min-h-screen bg-gray-50">
     <!-- Loading state -->
     <div id="loading" class="flex items-center justify-center min-h-screen">
       <div class="flex flex-col items-center space-y-4">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <p class="text-gray-600 font-medium">Generando reportes...</p>
+        <p class="text-gray-600 font-medium">Cargando reportes...</p>
       </div>
     </div>
 
@@ -25,69 +25,26 @@ import MotionSimple from '../components/MotionSimple.astro';
         <div class="flex justify-between items-center mb-8">
           <div>
             <h2 class="text-3xl font-bold text-gray-900" style="font-family: Inter;">Reportes y Análisis</h2>
-            <p class="text-gray-600 mt-2">Estadísticas detalladas y análisis del rendimiento</p>
+            <p class="text-gray-600 mt-2">Analiza el rendimiento de tu sistema de repartos</p>
           </div>
-          <div class="flex space-x-3">
-            <button 
-              id="refreshReports"
-              class="btn-outline"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-              </svg>
-              Actualizar
-            </button>
-            <button 
-              id="exportBtn"
-              class="btn-secondary"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-              Exportar Reporte
-            </button>
-          </div>
+          <button 
+            id="exportBtn"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 font-medium"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>Exportar</span>
+          </button>
         </div>
 
-        <!-- Selector de tipo de reporte -->
-        <div class="card mb-8">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="flex-1">
-              <label for="reportType" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Reporte</label>
-              <select id="reportType" class="input-field">
-                <option value="general">Reporte General</option>
-                <option value="repartos">Análisis de Repartos</option>
-                <option value="clientes">Estadísticas de Clientes</option>
-                <option value="rutas">Rendimiento de Rutas</option>
-                <option value="eficiencia">Análisis de Eficiencia</option>
-              </select>
-            </div>
-            <div class="flex items-center space-x-4">
-              <div>
-                <label for="dateFrom" class="block text-sm font-medium text-gray-700 mb-2">Desde</label>
-                <input type="date" id="dateFrom" class="input-field">
-              </div>
-              <div>
-                <label for="dateTo" class="block text-sm font-medium text-gray-700 mb-2">Hasta</label>
-                <input type="date" id="dateTo" class="input-field">
-              </div>
-              <button id="generateReport" class="btn-primary mt-6">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                Generar
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Métricas rápidas -->
+        <!-- Estadísticas generales -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div class="card">
+          <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-600 mb-1">Repartos del Mes</p>
-                <p id="repartosDelMes" class="text-2xl font-bold text-blue-600" style="font-family: Inter;">0</p>
+                <p class="text-sm font-medium text-gray-600 mb-1">Total Repartos</p>
+                <p id="totalRepartos" class="text-2xl font-bold text-blue-600" style="font-family: Inter;">0</p>
               </div>
               <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,98 +54,76 @@ import MotionSimple from '../components/MotionSimple.astro';
             </div>
           </div>
 
-          <div class="card">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-gray-600 mb-1">Eficiencia Promedio</p>
-                <p id="eficienciaPromedio" class="text-2xl font-bold text-green-600" style="font-family: Inter;">0%</p>
-              </div>
-              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
+          <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600 mb-1">Clientes Activos</p>
-                <p id="clientesActivos" class="text-2xl font-bold text-orange-600" style="font-family: Inter;">0</p>
+                <p id="totalClientes" class="text-2xl font-bold text-green-600" style="font-family: Inter;">0</p>
               </div>
-              <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
               </div>
             </div>
           </div>
 
-          <div class="card">
+          <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-600 mb-1">Tiempo Promedio</p>
-                <p id="tiempoPromedio" class="text-2xl font-bold text-purple-600" style="font-family: Inter;">0h</p>
+                <p class="text-sm font-medium text-gray-600 mb-1">Flota Activa</p>
+                <p id="totalCamiones" class="text-2xl font-bold text-orange-600" style="font-family: Inter;">0</p>
+              </div>
+              <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 mb-1">Eficiencia</p>
+                <p id="eficienciaPromedio" class="text-2xl font-bold text-purple-600" style="font-family: Inter;">0%</p>
               </div>
               <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Contenido del reporte -->
-        <div class="card">
-          <div class="flex items-center justify-between mb-6">
-            <h3 id="reportTitle" class="text-xl font-semibold text-gray-900" style="font-family: Inter;">Reporte General</h3>
-            <div class="text-sm text-gray-500">
-              Última actualización: <span id="lastUpdate">--</span>
-            </div>
-          </div>
-          
-          <div id="reportContent" class="space-y-6">
-            <!-- Report content will be loaded here -->
-            <div class="text-center py-12">
-              <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-              <p class="text-gray-600">Selecciona un tipo de reporte y haz clic en "Generar" para ver los datos</p>
-            </div>
-          </div>
-        </div>
-        </div>
-      </nav>
-
-      <!-- Main Content -->
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Report Type Selector -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <!-- Selector de reportes -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
           <h3 class="text-lg font-medium text-gray-900 mb-4">Seleccionar Tipo de Reporte</h3>
-          <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <button id="reportGeneral" class="report-btn px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              📊 General
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <button id="reportGeneral" class="report-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors font-medium active">
+              📊 Reporte General
             </button>
-            <button id="reportRepartos" class="report-btn px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-              🚛 Repartos
+            <button id="reportRepartos" class="report-btn bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-medium">
+              🚛 Análisis de Repartos
             </button>
-            <button id="reportClientes" class="report-btn px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-              👥 Clientes
+            <button id="reportClientes" class="report-btn bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg transition-colors font-medium">
+              👥 Reporte de Clientes
             </button>
-            <button id="reportRutas" class="report-btn px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
-              🛣️ Rutas
-            </button>
-            <button id="reportEficiencia" class="report-btn px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-              ⚡ Eficiencia
+            <button id="reportEficiencia" class="report-btn bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-lg transition-colors font-medium">
+              ⚡ Eficiencia de Flota
             </button>
           </div>
         </div>
 
-        <!-- Report Content -->
-        <div id="reportContent">
-          <!-- Content will be loaded dynamically -->
+        <!-- Contenido del reporte -->
+        <div id="reportContent" class="bg-white rounded-lg shadow p-6">
+          <div class="text-center py-8">
+            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <p class="text-gray-500">Selecciona un tipo de reporte para ver los datos</p>
+          </div>
         </div>
       </main>
     </div>
@@ -196,12 +131,13 @@ import MotionSimple from '../components/MotionSimple.astro';
 
   <script>
     let currentReportType = 'general';
-    let currentReportData = {};
+    let allData = {};
 
     document.addEventListener('DOMContentLoaded', async () => {
       await checkAuth();
-      await loadReport('general');
+      await loadData();
       setupEventListeners();
+      generateReport('general');
     });
 
     async function checkAuth() {
@@ -221,385 +157,53 @@ import MotionSimple from '../components/MotionSimple.astro';
       }
     }
 
-    async function loadReport(tipo) {
+    async function loadData() {
       try {
-        showLoading();
+        const [repartosResponse, clientesResponse, camionesResponse] = await Promise.all([
+          fetch('/api/repartos'),
+          fetch('/api/clientes'),
+          fetch('/api/camiones')
+        ]);
         
-        const response = await fetch(`/api/reportes?tipo=${tipo}`);
-        const data = await response.json();
+        const repartosData = await repartosResponse.json();
+        const clientesData = await clientesResponse.json();
+        const camionesData = await camionesResponse.json();
         
-        if (data.success) {
-          currentReportType = tipo;
-          currentReportData = data.data;
-          renderReport(tipo, data.data);
-        }
+        if (repartosData.success) allData.repartos = repartosData.data;
+        if (clientesData.success) allData.clientes = clientesData.data;
+        if (camionesData.success) allData.camiones = camionesData.data;
         
-        hideLoading();
+        updateGeneralStats();
+        
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('hidden');
         
       } catch (error) {
-        console.error('Error loading report:', error);
-        hideLoading();
+        console.error('Error loading data:', error);
       }
     }
 
-    function showLoading() {
-      document.getElementById('reportContent').innerHTML = `
-        <div class="flex items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
-          <span class="ml-3 text-lg text-gray-600">Generando reporte...</span>
-        </div>
-      `;
-    }
-
-    function hideLoading() {
-      document.getElementById('loading').classList.add('hidden');
-      document.getElementById('mainContent').classList.remove('hidden');
-    }
-
-    function renderReport(tipo, data) {
-      const container = document.getElementById('reportContent');
+    function updateGeneralStats() {
+      const repartos = allData.repartos || [];
+      const clientes = allData.clientes || [];
+      const camiones = allData.camiones || [];
       
-      switch (tipo) {
-        case 'general':
-          container.innerHTML = renderGeneralReport(data);
-          break;
-        case 'repartos':
-          container.innerHTML = renderRepartosReport(data);
-          break;
-        case 'clientes':
-          container.innerHTML = renderClientesReport(data);
-          break;
-        case 'rutas':
-          container.innerHTML = renderRutasReport(data);
-          break;
-        case 'eficiencia':
-          container.innerHTML = renderEficienciaReport(data);
-          break;
-      }
-    }
-
-    function renderGeneralReport(data) {
-      return `
-        <div class="space-y-6">
-          <!-- Summary Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div class="bg-white rounded-lg shadow p-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-green-600">${data.totales.total_clientes_activos}</div>
-                <div class="text-sm text-gray-600">Clientes Activos</div>
-              </div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-blue-600">${data.totales.total_camiones}</div>
-                <div class="text-sm text-gray-600">Camiones</div>
-              </div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-purple-600">${data.totales.total_rutas}</div>
-                <div class="text-sm text-gray-600">Rutas</div>
-              </div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-yellow-600">${data.totales.total_repartos}</div>
-                <div class="text-sm text-gray-600">Repartos</div>
-              </div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-red-600">${data.totales.total_clientes_inactivos}</div>
-                <div class="text-sm text-gray-600">Clientes Inactivos</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Charts -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Clientes por Ruta -->
-            <div class="bg-white rounded-lg shadow p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Clientes por Ruta</h3>
-              <div class="space-y-3">
-                ${data.clientesPorRuta.map(item => {
-                  const total = data.clientesPorRuta.reduce((acc, curr) => acc + parseInt(curr.total_clientes), 0);
-                  const percentage = total > 0 ? (item.total_clientes / total) * 100 : 0;
-                  return `
-                    <div class="flex items-center justify-between">
-                      <span class="text-sm font-medium text-gray-700">${item.ruta}</span>
-                      <div class="flex items-center space-x-2">
-                        <div class="w-32 bg-gray-200 rounded-full h-2">
-                          <div class="bg-blue-600 h-2 rounded-full" style="width: ${percentage}%"></div>
-                        </div>
-                        <span class="text-sm text-gray-600 w-8">${item.total_clientes}</span>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-
-            <!-- Utilización de Camiones -->
-            <div class="bg-white rounded-lg shadow p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Utilización de Camiones</h3>
-              <div class="space-y-3">
-                ${data.utilizacionCamiones.map(item => {
-                  const maxRepartos = Math.max(...data.utilizacionCamiones.map(c => parseInt(c.total_repartos)));
-                  const percentage = maxRepartos > 0 ? (item.total_repartos / maxRepartos) * 100 : 0;
-                  return `
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <span class="text-sm font-medium text-gray-700">${item.camion}</span>
-                        <div class="text-xs text-gray-500">${item.rutas_diferentes} rutas diferentes</div>
-                      </div>
-                      <div class="flex items-center space-x-2">
-                        <div class="w-24 bg-gray-200 rounded-full h-2">
-                          <div class="bg-green-600 h-2 rounded-full" style="width: ${percentage}%"></div>
-                        </div>
-                        <span class="text-sm text-gray-600 w-8">${item.total_repartos}</span>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderRepartosReport(data) {
-      return `
-        <div class="space-y-6">
-          <!-- Repartos Activos -->
-          <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h3 class="text-lg font-medium text-gray-900">Repartos Activos</h3>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ruta</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Camión</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clientes</th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  ${data.repartosActivos.map(reparto => `
-                    <tr>
-                      <td class="px-6 py-4 text-sm text-gray-900">#${reparto.id}</td>
-                      <td class="px-6 py-4 text-sm text-gray-900">${reparto.ruta || 'Sin asignar'}</td>
-                      <td class="px-6 py-4 text-sm text-gray-900">${reparto.camion || 'Sin asignar'}</td>
-                      <td class="px-6 py-4 text-sm text-gray-900">${reparto.total_clientes} clientes</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Distribución por Rutas -->
-          <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Distribución por Rutas</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              ${data.distribucionRutas.map(ruta => `
-                <div class="border rounded-lg p-4">
-                  <h4 class="font-medium text-gray-900">${ruta.ruta}</h4>
-                  <div class="mt-2 space-y-1">
-                    <div class="text-sm text-gray-600">Repartos: ${ruta.total_repartos}</div>
-                    <div class="text-sm text-gray-600">Promedio clientes: ${parseFloat(ruta.promedio_clientes || 0).toFixed(1)}</div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderClientesReport(data) {
-      return `
-        <div class="space-y-6">
-          <!-- Distribución por Estado -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-lg shadow p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Distribución por Estado</h3>
-              <div class="space-y-3">
-                ${data.estadoDistribucion.map(item => `
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-gray-700">${item.estado}</span>
-                    <div class="flex items-center space-x-2">
-                      <div class="w-24 bg-gray-200 rounded-full h-2">
-                        <div class="h-2 rounded-full ${item.estado === 'Activo' ? 'bg-green-600' : 'bg-red-600'}" style="width: ${item.porcentaje}%"></div>
-                      </div>
-                      <span class="text-sm text-gray-600">${item.total} (${item.porcentaje}%)</span>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Coordenadas GPS</h3>
-              <div class="space-y-3">
-                ${data.coordenadasStats.map(item => `
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-gray-700">${item.tipo_coordenadas}</span>
-                    <div class="flex items-center space-x-2">
-                      <div class="w-24 bg-gray-200 rounded-full h-2">
-                        <div class="h-2 rounded-full ${item.tipo_coordenadas === 'Con GPS' ? 'bg-blue-600' : 'bg-gray-400'}" style="width: ${(item.total / data.coordenadasStats.reduce((acc, curr) => acc + parseInt(curr.total), 0)) * 100}%"></div>
-                      </div>
-                      <span class="text-sm text-gray-600">${item.total}</span>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          </div>
-
-          <!-- Top Clientes -->
-          <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h3 class="text-lg font-medium text-gray-900">Top 10 Clientes por Frecuencia</h3>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Razón Social</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Repartos</th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  ${data.topClientes.map((cliente, index) => `
-                    <tr>
-                      <td class="px-6 py-4">
-                        <div class="flex items-center">
-                          <div class="shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-700">
-                            ${index + 1}
-                          </div>
-                          <div class="ml-3">
-                            <div class="text-sm font-medium text-gray-900">${cliente.nombre}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 text-sm text-gray-900">${cliente.razonsocial}</td>
-                      <td class="px-6 py-4 text-sm text-gray-900">${cliente.total_repartos}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderRutasReport(data) {
-      return `
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Análisis de Rutas</h3>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ruta</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Repartos</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Camiones Diferentes</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clientes Únicos</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Promedio Clientes/Reparto</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                ${data.analisisRutas.map(ruta => `
-                  <tr>
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${ruta.ruta}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">${ruta.total_repartos}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">${ruta.camiones_diferentes}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">${ruta.clientes_unicos}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">${parseFloat(ruta.promedio_clientes_por_reparto || 0).toFixed(1)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderEficienciaReport(data) {
-      return `
-        <div class="space-y-6">
-          <!-- KPIs -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-white rounded-lg shadow p-6 text-center">
-              <div class="text-3xl font-bold text-blue-600">${data.kpis.promedio_clientes_por_reparto}</div>
-              <div class="text-sm text-gray-600">Promedio Clientes/Reparto</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6 text-center">
-              <div class="text-3xl font-bold text-green-600">${data.kpis.camiones_activos}</div>
-              <div class="text-sm text-gray-600">Camiones Activos</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6 text-center">
-              <div class="text-3xl font-bold text-purple-600">${data.kpis.rutas_activas}</div>
-              <div class="text-sm text-gray-600">Rutas Activas</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6 text-center">
-              <div class="text-3xl font-bold text-yellow-600">${data.kpis.clientes_en_repartos}</div>
-              <div class="text-sm text-gray-600">Clientes en Repartos</div>
-            </div>
-          </div>
-
-          <!-- Eficiencia de Camiones -->
-          <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h3 class="text-lg font-medium text-gray-900">Eficiencia de Camiones</h3>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Camión</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Repartos</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rutas Cubiertas</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clientes Servidos</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Eficiencia</th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  ${data.eficienciaCamiones.map(camion => {
-                    const eficiencia = parseFloat(camion.promedio_clientes_por_reparto);
-                    const eficienciaClass = eficiencia >= 3 ? 'text-green-600' : eficiencia >= 2 ? 'text-yellow-600' : 'text-red-600';
-                    return `
-                      <tr>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${camion.camion}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900">${camion.total_repartos}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900">${camion.rutas_cubiertas}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900">${camion.total_clientes_servidos}</td>
-                        <td class="px-6 py-4 text-sm font-medium ${eficienciaClass}">${eficiencia} clientes/reparto</td>
-                      </tr>
-                    `;
-                  }).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      `;
+      document.getElementById('totalRepartos').textContent = repartos.length;
+      document.getElementById('totalClientes').textContent = clientes.filter(c => c.estado === 'Activo').length;
+      document.getElementById('totalCamiones').textContent = camiones.length;
+      
+      // Calcular eficiencia básica (ejemplo)
+      const repartosCompletos = repartos.filter(r => r.estado === 'completado').length;
+      const eficiencia = repartos.length > 0 ? Math.round((repartosCompletos / repartos.length) * 100) : 0;
+      document.getElementById('eficienciaPromedio').textContent = eficiencia + '%';
     }
 
     function setupEventListeners() {
-      // Report type buttons
-      document.getElementById('reportGeneral').addEventListener('click', () => loadReport('general'));
-      document.getElementById('reportRepartos').addEventListener('click', () => loadReport('repartos'));
-      document.getElementById('reportClientes').addEventListener('click', () => loadReport('clientes'));
-      document.getElementById('reportRutas').addEventListener('click', () => loadReport('rutas'));
-      document.getElementById('reportEficiencia').addEventListener('click', () => loadReport('eficiencia'));
+      // Report buttons
+      document.getElementById('reportGeneral').addEventListener('click', () => generateReport('general'));
+      document.getElementById('reportRepartos').addEventListener('click', () => generateReport('repartos'));
+      document.getElementById('reportClientes').addEventListener('click', () => generateReport('clientes'));
+      document.getElementById('reportEficiencia').addEventListener('click', () => generateReport('eficiencia'));
       
       // Export button
       document.getElementById('exportBtn').addEventListener('click', exportReport);
@@ -611,24 +215,270 @@ import MotionSimple from '../components/MotionSimple.astro';
       });
     }
 
+    function generateReport(type) {
+      currentReportType = type;
+      
+      // Update active button
+      document.querySelectorAll('.report-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`report${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.add('active');
+      
+      const content = document.getElementById('reportContent');
+      
+      switch(type) {
+        case 'general':
+          content.innerHTML = generateGeneralReport();
+          break;
+        case 'repartos':
+          content.innerHTML = generateRepartosReport();
+          break;
+        case 'clientes':
+          content.innerHTML = generateClientesReport();
+          break;
+        case 'eficiencia':
+          content.innerHTML = generateEficienciaReport();
+          break;
+      }
+    }
+
+    function generateGeneralReport() {
+      const repartos = allData.repartos || [];
+      const clientes = allData.clientes || [];
+      const camiones = allData.camiones || [];
+      
+      return `
+        <h3 class="text-xl font-bold text-gray-900 mb-6">📊 Reporte General del Sistema</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <h4 class="text-lg font-semibold text-gray-800">Resumen de Operaciones</h4>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Total de Repartos:</span>
+                <span class="font-semibold">${repartos.length}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Clientes Activos:</span>
+                <span class="font-semibold">${clientes.filter(c => c.estado === 'Activo').length}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Camiones en Flota:</span>
+                <span class="font-semibold">${camiones.length}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Repartos Completados:</span>
+                <span class="font-semibold text-green-600">${repartos.filter(r => r.estado === 'completado').length}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="space-y-4">
+            <h4 class="text-lg font-semibold text-gray-800">Estado de la Flota</h4>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Camiones Disponibles:</span>
+                <span class="font-semibold text-green-600">${camiones.length - new Set(repartos.map(r => r.camion_id)).size}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Camiones en Reparto:</span>
+                <span class="font-semibold text-blue-600">${new Set(repartos.map(r => r.camion_id)).size}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Promedio de Clientes por Reparto:</span>
+                <span class="font-semibold">${repartos.length > 0 ? Math.round(repartos.reduce((acc, r) => acc + (r.clientes ? r.clientes.length : 0), 0) / repartos.length) : 0}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-8">
+          <h4 class="text-lg font-semibold text-gray-800 mb-4">Análisis de Distribución</h4>
+          <div class="bg-gray-50 rounded-lg p-4">
+            <p class="text-sm text-gray-600">Este reporte muestra un resumen general del estado actual del sistema de repartos, incluyendo la utilización de la flota y la distribución de clientes.</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function generateRepartosReport() {
+      const repartos = allData.repartos || [];
+      
+      return `
+        <h3 class="text-xl font-bold text-gray-900 mb-6">🚛 Análisis Detallado de Repartos</h3>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ruta</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conductor</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clientes</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              ${repartos.map(reparto => `
+                <tr>
+                  <td class="px-6 py-4 text-sm font-medium text-gray-900">#${reparto.id}</td>
+                  <td class="px-6 py-4 text-sm text-gray-900">${reparto.ruta_nombre || 'Sin ruta'}</td>
+                  <td class="px-6 py-4 text-sm text-gray-900">${reparto.camion_nombre || 'Sin conductor'}</td>
+                  <td class="px-6 py-4 text-sm text-gray-900">${reparto.clientes ? reparto.clientes.length : 0} clientes</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${reparto.estado === 'completado' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                      ${reparto.estado || 'Programado'}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function generateClientesReport() {
+      const clientes = allData.clientes || [];
+      const activos = clientes.filter(c => c.estado === 'Activo');
+      const inactivos = clientes.filter(c => c.estado === 'Inactivo');
+      
+      return `
+        <h3 class="text-xl font-bold text-gray-900 mb-6">👥 Reporte de Clientes</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-green-50 rounded-lg p-4">
+            <h4 class="text-lg font-semibold text-green-800">Clientes Activos</h4>
+            <p class="text-3xl font-bold text-green-600">${activos.length}</p>
+          </div>
+          <div class="bg-red-50 rounded-lg p-4">
+            <h4 class="text-lg font-semibold text-red-800">Clientes Inactivos</h4>
+            <p class="text-3xl font-bold text-red-600">${inactivos.length}</p>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Razón Social</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contacto</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ubicación</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              ${clientes.map(cliente => `
+                <tr>
+                  <td class="px-6 py-4">
+                    <div class="text-sm font-medium text-gray-900">${cliente.razonsocial}</div>
+                    <div class="text-sm text-gray-500">${cliente.nombre}</div>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-900">${cliente.telefono || 'Sin teléfono'}</td>
+                  <td class="px-6 py-4 text-sm text-gray-900">${cliente.direccion}</td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${cliente.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                      ${cliente.estado}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function generateEficienciaReport() {
+      const repartos = allData.repartos || [];
+      const camiones = allData.camiones || [];
+      
+      const eficienciaPorCamion = camiones.map(camion => {
+        const repartosCamion = repartos.filter(r => r.camion_id === camion.id);
+        const completados = repartosCamion.filter(r => r.estado === 'completado').length;
+        const eficiencia = repartosCamion.length > 0 ? Math.round((completados / repartosCamion.length) * 100) : 0;
+        
+        return {
+          ...camion,
+          totalRepartos: repartosCamion.length,
+          completados,
+          eficiencia
+        };
+      });
+      
+      return `
+        <h3 class="text-xl font-bold text-gray-900 mb-6">⚡ Análisis de Eficiencia de Flota</h3>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conductor</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Repartos</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Completados</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Eficiencia</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              ${eficienciaPorCamion.map(camion => `
+                <tr>
+                  <td class="px-6 py-4 text-sm font-medium text-gray-900">${camion.nombre}</td>
+                  <td class="px-6 py-4 text-sm text-gray-900">${camion.totalRepartos}</td>
+                  <td class="px-6 py-4 text-sm text-gray-900">${camion.completados}</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: ${camion.eficiencia}%"></div>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900">${camion.eficiencia}%</span>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-6 bg-blue-50 rounded-lg p-4">
+          <h4 class="text-md font-semibold text-blue-800 mb-2">Información</h4>
+          <p class="text-sm text-blue-700">La eficiencia se calcula como el porcentaje de repartos completados exitosamente respecto al total de repartos asignados a cada conductor.</p>
+        </div>
+      `;
+    }
+
     function exportReport() {
-      // Create a simple text export
-      let exportContent = `REPORTE DEL SISTEMA DE REPARTOS\n`;
-      exportContent += `Tipo: ${currentReportType.toUpperCase()}\n`;
-      exportContent += `Fecha: ${new Date().toLocaleDateString()}\n`;
-      exportContent += `\n` + '='.repeat(50) + `\n\n`;
+      const reportContent = document.getElementById('reportContent').innerHTML;
+      const reportTitle = `Reporte ${currentReportType.charAt(0).toUpperCase() + currentReportType.slice(1)}`;
       
-      // Add report data as JSON for now (could be enhanced to create proper CSV/PDF)
-      exportContent += JSON.stringify(currentReportData, null, 2);
-      
-      // Create and download file
-      const blob = new Blob([exportContent], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `reporte_${currentReportType}_${new Date().toISOString().split('T')[0]}.txt`;
-      a.click();
-      window.URL.revokeObjectURL(url);
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${reportTitle}</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              h3 { color: #1f2937; }
+              table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f9fafb; }
+              .grid { display: none; }
+              @media print { body { margin: 0; } }
+            </style>
+          </head>
+          <body>
+            <h1>Sistema de Repartos - ${reportTitle}</h1>
+            <p>Generado el: ${new Date().toLocaleDateString()}</p>
+            ${reportContent}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
     }
   </script>
+
+  <style>
+    .report-btn.active {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  </style>
 </Layout>
