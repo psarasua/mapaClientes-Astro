@@ -6,9 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config  
 export default defineConfig({
   output: 'server',
-  adapter: netlify({
-    edgeMiddleware: false
-  }),
+  adapter: netlify(),
   vite: {
     plugins: [tailwindcss()]
   }
