@@ -1,0 +1,285 @@
+---
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  time: string;
+  read: boolean;
+}
+
+interface Props {
+  notifications?: Notification[];
+  maxDisplay?: number;
+}
+
+const { 
+  notifications = [],
+  maxDisplay = 5
+} = Astro.props;
+
+// Default notifications for demo
+const defaultNotifications: Notification[] = [
+  {
+    id: '1',
+    title: 'Nuevo reparto asignado',
+    message: 'Se ha asignado el reparto #R001 al camión CAM-001',
+    type: 'info',
+    time: 'hace 5 min',
+    read: false
+  },
+  {
+    id: '2',
+    title: 'Camión en mantenimiento',
+    message: 'CAM-003 ha sido programado para mantenimiento',
+    type: 'warning',
+    time: 'hace 15 min',
+    read: false
+  },
+  {
+    id: '3',
+    title: 'Reparto completado',
+    message: 'Reparto #R005 completado exitosamente',
+    type: 'success',
+    time: 'hace 1 hora',
+    read: true
+  }
+];
+
+const allNotifications = notifications.length > 0 ? notifications : defaultNotifications;
+const unreadCount = allNotifications.filter(n => !n.read).length;
+const displayNotifications = allNotifications.slice(0, maxDisplay);
+
+// Type colors
+const typeColors = {
+  info: 'text-blue-600 bg-blue-100',
+  success: 'text-green-600 bg-green-100',
+  warning: 'text-yellow-600 bg-yellow-100',
+  error: 'text-red-600 bg-red-100'
+};
+
+// Type icons
+const typeIcons = {
+  info: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+  success: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+  warning: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z',
+  error: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
+};
+---
+
+<div class="relative" data-motion="fade-in">
+  <!-- Notification Bell Button -->
+  <button 
+    id="notification-bell"
+    class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    aria-label="Notificaciones"
+  >
+    <!-- Bell Icon -->
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+    </svg>
+    
+    <!-- Notification Badge -->
+    {unreadCount > 0 && (
+      <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full animate-pulse">
+        {unreadCount > 99 ? '99+' : unreadCount}
+      </span>
+    )}
+  </button>
+
+  <!-- Notification Dropdown Panel -->
+  <div 
+    id="notification-panel"
+    class="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-50 opacity-0 invisible transform translate-y-2 transition-all duration-200"
+  >
+    <!-- Panel Header -->
+    <div class="px-4 py-3 border-b border-gray-100">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">Notificaciones</h3>
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-gray-500">{unreadCount} nuevas</span>
+          {unreadCount > 0 && (
+            <button 
+              id="mark-all-read"
+              class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            >
+              Marcar todas como leídas
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="max-h-96 overflow-y-auto">
+      {displayNotifications.length === 0 ? (
+        <div class="px-4 py-8 text-center">
+          <svg class="w-12 h-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          </svg>
+          <p class="text-gray-500">No hay notificaciones</p>
+        </div>
+      ) : (
+        displayNotifications.map((notification) => (
+          <div 
+            class={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer ${!notification.read ? 'bg-blue-50/50' : ''}`}
+            data-notification-id={notification.id}
+          >
+            <div class="flex items-start space-x-3">
+              <!-- Type Icon -->
+              <div class={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${typeColors[notification.type]}`}>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={typeIcons[notification.type]}></path>
+                </svg>
+              </div>
+              
+              <!-- Content -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between">
+                  <p class={`text-sm font-medium ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                    {notification.title}
+                  </p>
+                  {!notification.read && (
+                    <div class="shrink-0 w-2 h-2 bg-blue-500 rounded-full ml-2 mt-1"></div>
+                  )}
+                </div>
+                <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+                  {notification.message}
+                </p>
+                <p class="text-xs text-gray-400 mt-1">
+                  {notification.time}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+
+    <!-- Panel Footer -->
+    <div class="px-4 py-3 border-t border-gray-100">
+      <button class="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
+        Ver todas las notificaciones
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const bell = document.getElementById('notification-bell');
+    const panel = document.getElementById('notification-panel');
+    const markAllRead = document.getElementById('mark-all-read');
+    
+    if (!bell || !panel) return;
+    
+    let isOpen = false;
+    
+    // Toggle panel
+    function togglePanel() {
+      isOpen = !isOpen;
+      
+      if (isOpen) {
+        panel.classList.remove('opacity-0', 'invisible', 'translate-y-2');
+        panel.classList.add('opacity-100', 'visible', 'translate-y-0');
+      } else {
+        panel.classList.add('opacity-0', 'invisible', 'translate-y-2');
+        panel.classList.remove('opacity-100', 'visible', 'translate-y-0');
+      }
+    }
+    
+    // Bell click handler
+    bell.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePanel();
+    });
+    
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+      const target = e.target as Node;
+      if (isOpen && target && !panel.contains(target) && !bell.contains(target)) {
+        togglePanel();
+      }
+    });
+    
+    // Mark all as read
+    if (markAllRead) {
+      markAllRead.addEventListener('click', () => {
+        // Update UI
+        const notifications = panel.querySelectorAll('[data-notification-id]');
+        notifications.forEach(notification => {
+          notification.classList.remove('bg-blue-50/50');
+          const dot = notification.querySelector('.bg-blue-500');
+          if (dot) dot.remove();
+        });
+        
+        // Update badge
+        const badge = bell.querySelector('.bg-red-500');
+        if (badge) badge.remove();
+        
+        // Hide mark all read button
+        markAllRead.style.display = 'none';
+        
+        // Update counter
+        const counter = panel.querySelector('.text-gray-500');
+        if (counter) counter.textContent = '0 nuevas';
+        
+        // Show success feedback
+        const successMsg = document.createElement('div');
+        successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50';
+        successMsg.textContent = 'Notificaciones marcadas como leídas';
+        document.body.appendChild(successMsg);
+        
+        setTimeout(() => {
+          successMsg.classList.remove('translate-x-full');
+        }, 100);
+        
+        setTimeout(() => {
+          successMsg.classList.add('translate-x-full');
+          setTimeout(() => successMsg.remove(), 300);
+        }, 3000);
+      });
+    }
+    
+    // Individual notification click
+    panel.addEventListener('click', (e) => {
+      const target = e.target as Element;
+      const notification = target?.closest('[data-notification-id]');
+      if (notification) {
+        // Mark as read
+        notification.classList.remove('bg-blue-50/50');
+        const dot = notification.querySelector('.bg-blue-500');
+        if (dot) dot.remove();
+        
+        // Update badge count
+        const badge = bell.querySelector('.bg-red-500');
+        if (badge) {
+          const currentCount = parseInt(badge.textContent);
+          const newCount = currentCount - 1;
+          
+          if (newCount <= 0) {
+            badge.remove();
+          } else {
+            badge.textContent = newCount > 99 ? '99+' : newCount.toString();
+          }
+        }
+      }
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        togglePanel();
+      }
+    });
+  });
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

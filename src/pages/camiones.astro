@@ -2,6 +2,102 @@
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
 import MotionSimple from '../components/MotionSimple.astro';
+import AdvancedSearch from '../components/search/AdvancedSearch.astro';
+import EnhancedTable from '../components/search/EnhancedTable.astro';
+
+// Configuración de campos de búsqueda para camiones
+const searchFields = [
+  {
+    key: 'matricula',
+    label: 'Matrícula',
+    type: 'text' as const,
+    placeholder: 'Buscar por matrícula...'
+  },
+  {
+    key: 'marca',
+    label: 'Marca',
+    type: 'text' as const,
+    placeholder: 'Buscar por marca...'
+  },
+  {
+    key: 'modelo',
+    label: 'Modelo',
+    type: 'text' as const,
+    placeholder: 'Buscar por modelo...'
+  },
+  {
+    key: 'estado',
+    label: 'Estado',
+    type: 'select' as const,
+    options: [
+      { value: 'Activo', label: 'Activo' },
+      { value: 'Mantenimiento', label: 'Mantenimiento' },
+      { value: 'Inactivo', label: 'Inactivo' },
+      { value: 'Disponible', label: 'Disponible' }
+    ]
+  },
+  {
+    key: 'capacidad',
+    label: 'Capacidad (kg)',
+    type: 'number' as const,
+    placeholder: 'Capacidad mínima...'
+  },
+  {
+    key: 'fecha_adquisicion',
+    label: 'Fecha de Adquisición',
+    type: 'date' as const
+  }
+];
+
+// Configuración de columnas para la tabla
+const tableColumns = [
+  {
+    key: 'matricula',
+    label: 'Matrícula',
+    sortable: true,
+    type: 'text' as const
+  },
+  {
+    key: 'marca',
+    label: 'Marca',
+    sortable: true,
+    type: 'text' as const
+  },
+  {
+    key: 'modelo',
+    label: 'Modelo',
+    sortable: true,
+    type: 'text' as const
+  },
+  {
+    key: 'conductor_nombre',
+    label: 'Conductor',
+    sortable: true,
+    type: 'text' as const
+  },
+  {
+    key: 'estado',
+    label: 'Estado',
+    sortable: true,
+    type: 'badge' as const,
+    align: 'center' as const
+  },
+  {
+    key: 'capacidad_kg',
+    label: 'Capacidad',
+    sortable: true,
+    type: 'text' as const,
+    align: 'center' as const
+  },
+  {
+    key: 'actions',
+    label: 'Acciones',
+    sortable: false,
+    type: 'actions' as const,
+    align: 'center' as const,
+    width: '120px'
+  }
+];
 ---
 
 <Layout title="Gestión de Camiones - Sistema de Repartos">
@@ -22,57 +118,44 @@ import MotionSimple from '../components/MotionSimple.astro';
       <!-- Content -->
       <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         <!-- Header de página -->
-        <div class="flex justify-between items-center mb-8">
-          <div>
-            <h2 class="text-3xl font-bold text-gray-900" style="font-family: Inter;">Gestión de Flota</h2>
-            <p class="text-gray-600 mt-2">Administra tus vehículos y conductores</p>
+        <div class="flex justify-between items-center mb-8" data-motion="fade-up" data-delay="0">
+          <div data-motion="fade-right" data-delay="100">
+            <h2 class="text-3xl font-bold text-gray-900" style="font-family: Inter;">Gestión de Camiones</h2>
+            <p class="text-gray-600 mt-2">Administra la flota de vehículos de distribución</p>
           </div>
           <button 
-            id="addTruckBtn"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 font-medium"
+            id="addCamionBtn"
+            class="btn-primary motion-hover-scale"
+            data-motion="fade-left" data-delay="200"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-            <span>Nuevo Camión</span>
+            Nuevo Camión
           </button>
         </div>
 
         <!-- Estadísticas rápidas -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="bg-white rounded-lg shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-motion="fade-up" data-delay="300">
+          <div class="bg-white rounded-lg shadow p-6 motion-hover-card" data-motion="fade-up" data-delay="350">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600 mb-1">Total Camiones</p>
-                <p id="totalTrucks" class="text-2xl font-bold text-gray-900" style="font-family: Inter;">0</p>
+                <p id="totalCamiones" class="text-2xl font-bold text-gray-900" style="font-family: Inter;">0</p>
               </div>
               <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
                 </svg>
               </div>
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-white rounded-lg shadow p-6 motion-hover-card" data-motion="fade-up" data-delay="400">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-600 mb-1">En Repartos</p>
-                <p id="trucksInDelivery" class="text-2xl font-bold text-blue-600" style="font-family: Inter;">0</p>
-              </div>
-              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-gray-600 mb-1">Disponibles</p>
-                <p id="availableTrucks" class="text-2xl font-bold text-green-600" style="font-family: Inter;">0</p>
+                <p class="text-sm font-medium text-gray-600 mb-1">Activos</p>
+                <p id="activosCamiones" class="text-2xl font-bold text-green-600" style="font-family: Inter;">0</p>
               </div>
               <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,43 +164,139 @@ import MotionSimple from '../components/MotionSimple.astro';
               </div>
             </div>
           </div>
+
+          <div class="bg-white rounded-lg shadow p-6 motion-hover-card" data-motion="fade-up" data-delay="450">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 mb-1">Mantenimiento</p>
+                <p id="mantenimientoCamiones" class="text-2xl font-bold text-orange-600" style="font-family: Inter;">0</p>
+              </div>
+              <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-6 motion-hover-card" data-motion="fade-up" data-delay="500">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 mb-1">Disponibles</p>
+                <p id="disponiblesCamiones" class="text-2xl font-bold text-blue-600" style="font-family: Inter;">0</p>
+              </div>
+              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Lista de camiones -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Lista de Camiones</h3>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conductor</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repartos Asignados</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="trucksTableBody" class="bg-white divide-y divide-gray-200">
-                <!-- Trucks will be loaded here -->
-              </tbody>
-            </table>
-          </div>
+        <!-- Búsqueda Avanzada -->
+        <AdvancedSearch 
+          searchFields={searchFields}
+          onSearch="handleCamionSearch"
+        />
+
+        <!-- Tabla de Camiones -->
+        <div id="camionTableContainer">
+          <EnhancedTable 
+            columns={tableColumns}
+            data={[]}
+            loading={true}
+            selectable={true}
+            pagination={{
+              current: 1,
+              total: 0,
+              pageSize: 25
+            }}
+          />
         </div>
+        
+        <!-- Paginación -->
+        <div id="paginationContainer"></div>
       </main>
     </div>
 
-    <!-- Add/Edit Truck Modal -->
-    <div id="truckModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+    <!-- Add/Edit Camion Modal -->
+    <div id="camionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Nuevo Camión</h3>
         </div>
-        <form id="truckForm" class="px-6 py-4 space-y-4">
+        <form id="camionForm" class="px-6 py-4 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula *</label>
+              <input 
+                type="text" 
+                name="matricula" 
+                required 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="ABC-123"
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Marca *</label>
+              <input 
+                type="text" 
+                name="marca" 
+                required 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="Mercedes, Volvo, etc."
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Modelo *</label>
+              <input 
+                type="text" 
+                name="modelo" 
+                required 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="Actros, FH, etc."
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Capacidad (kg) *</label>
+              <input 
+                type="number" 
+                name="capacidad_kg" 
+                required 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="5000"
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
+              <select name="estado" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccionar estado</option>
+                <option value="Activo">Activo</option>
+                <option value="Disponible">Disponible</option>
+                <option value="Mantenimiento">Mantenimiento</option>
+                <option value="Inactivo">Inactivo</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Conductor</label>
+              <input 
+                type="text" 
+                name="conductor_nombre" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="Nombre del conductor"
+              >
+            </div>
+          </div>
+          
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Conductor *</label>
-            <input type="text" name="nombre" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej: Juan Pérez">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Adquisición</label>
+            <input 
+              type="date" 
+              name="fecha_adquisicion" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
           </div>
         </form>
         
@@ -125,7 +304,7 @@ import MotionSimple from '../components/MotionSimple.astro';
           <button id="cancelBtn" type="button" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
             Cancelar
           </button>
-          <button id="saveBtn" type="submit" form="truckForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+          <button id="saveBtn" type="submit" form="camionForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
             Guardar
           </button>
         </div>
@@ -134,14 +313,35 @@ import MotionSimple from '../components/MotionSimple.astro';
   </div>
 
   <script>
-    let trucks = [];
+    let camiones = [];
+    let filteredCamiones = [];
     let repartos = [];
-    let editingTruck = null;
+    let editingCamion = null;
+    let currentPage = 1;
+    let pageSize = 10;
+
+    // Definición de columnas de la tabla
+    const tableColumns = [
+      { key: 'matricula', label: 'Matrícula', sortable: true },
+      { key: 'marca', label: 'Marca', sortable: true },
+      { key: 'modelo', label: 'Modelo', sortable: true },
+      { key: 'conductor_nombre', label: 'Conductor', sortable: true },
+      { key: 'estado', label: 'Estado', sortable: true },
+      { key: 'capacidad_kg', label: 'Capacidad', sortable: true },
+      { key: 'actions', label: 'Acciones', sortable: false }
+    ];
 
     document.addEventListener('DOMContentLoaded', async () => {
       await checkAuth();
       await loadData();
       setupEventListeners();
+      
+      // Event listener para búsqueda avanzada
+      document.addEventListener('advancedSearchChange', (event) => {
+        const customEvent = event as CustomEvent;
+        const filters = customEvent.detail;
+        handleCamionSearch(filters);
+      });
     });
 
     async function checkAuth() {
@@ -163,25 +363,20 @@ import MotionSimple from '../components/MotionSimple.astro';
 
     async function loadData() {
       try {
-        // Load trucks and repartos in parallel
-        const [trucksResponse, repartosResponse] = await Promise.all([
+        const [camionesResponse, repartosResponse] = await Promise.all([
           fetch('/api/camiones'),
           fetch('/api/repartos')
         ]);
         
-        const trucksData = await trucksResponse.json();
+        const camionesData = await camionesResponse.json();
         const repartosData = await repartosResponse.json();
         
-        if (trucksData.success) {
-          trucks = trucksData.data;
-        }
+        if (camionesData.success) camiones = camionesData.data;
+        if (repartosData.success) repartos = repartosData.data;
         
-        if (repartosData.success) {
-          repartos = repartosData.data;
-        }
-        
-        renderTrucks();
+        filteredCamiones = [...camiones];
         updateStats();
+        updateTable();
         
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('mainContent').classList.remove('hidden');
@@ -192,103 +387,355 @@ import MotionSimple from '../components/MotionSimple.astro';
     }
 
     function updateStats() {
-      const totalTrucks = trucks.length;
-      const trucksInDelivery = new Set(repartos.map(r => r.camion_id)).size;
-      const availableTrucks = totalTrucks - trucksInDelivery;
+      const total = camiones.length;
+      const activos = camiones.filter(c => c.estado === 'Activo').length;
+      const enMantenimiento = camiones.filter(c => c.estado === 'Mantenimiento').length;
+      const disponibles = camiones.filter(c => c.estado === 'Disponible').length;
       
-      document.getElementById('totalTrucks').textContent = totalTrucks;
-      document.getElementById('trucksInDelivery').textContent = trucksInDelivery;
-      document.getElementById('availableTrucks').textContent = availableTrucks;
-    }
-
-    function renderTrucks() {
-      const tbody = document.getElementById('trucksTableBody');
-      
-      if (trucks.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="5" class="px-6 py-8 text-center text-gray-500">No hay camiones registrados</td>
-          </tr>
-        `;
-        return;
-      }
-      
-      tbody.innerHTML = trucks.map(truck => {
-        const truckRepartos = repartos.filter(r => r.camion_id === truck.id);
-        const isInDelivery = truckRepartos.length > 0;
-        
-        return `
-          <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4">
-              <div class="text-sm font-medium text-gray-900">#${truck.id}</div>
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 h-8 w-8">
-                  <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium text-gray-700">
-                    ${truck.nombre.charAt(0).toUpperCase()}
-                  </div>
-                </div>
-                <div class="ml-3">
-                  <div class="text-sm font-medium text-gray-900">${truck.nombre}</div>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                isInDelivery ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
-              }">
-                ${isInDelivery ? 'En Reparto' : 'Disponible'}
-              </span>
-            </td>
-            <td class="px-6 py-4">
-              <div class="text-sm text-gray-900">
-                ${truckRepartos.length} repartos activos
-              </div>
-              ${truckRepartos.length > 0 ? 
-                `<div class="text-xs text-gray-500">
-                  Rutas: ${truckRepartos.map(r => r.ruta_nombre).join(', ')}
-                </div>` : 
-                '<div class="text-xs text-gray-400">Sin asignaciones</div>'
-              }
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex space-x-2">
-                <button onclick="editTruck(${truck.id})" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                  Editar
-                </button>
-                <button onclick="deleteTruck(${truck.id})" class="text-red-600 hover:text-red-800 text-sm font-medium" ${isInDelivery ? 'disabled' : ''}>
-                  ${isInDelivery ? 'En uso' : 'Eliminar'}
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      document.getElementById('totalCamiones').textContent = total.toString();
+      document.getElementById('activosCamiones').textContent = activos.toString();
+      document.getElementById('mantenimientoCamiones').textContent = enMantenimiento.toString();
+      document.getElementById('disponiblesCamiones').textContent = disponibles.toString();
     }
 
     function setupEventListeners() {
-      // Modal controls
-      document.getElementById('addTruckBtn').addEventListener('click', () => openModal());
-      document.getElementById('cancelBtn').addEventListener('click', closeModal);
-      document.getElementById('truckForm').addEventListener('submit', saveTruck);
-      
-      // Logout
-      document.getElementById('logoutBtn').addEventListener('click', async () => {
-        await fetch('/api/auth/logout', { method: 'POST' });
-        window.location.href = '/login';
+      // Botón para nuevo camión
+      document.getElementById('newCamionBtn')?.addEventListener('click', () => {
+        editingCamion = null;
+        document.getElementById('modalTitle').textContent = 'Nuevo Camión';
+        document.getElementById('camionForm').reset();
+        document.getElementById('camionModal').classList.remove('hidden');
+      });
+
+      // Cerrar modal
+      document.getElementById('cancelBtn')?.addEventListener('click', () => {
+        document.getElementById('camionModal').classList.add('hidden');
+      });
+
+      // Click fuera del modal para cerrar
+      document.getElementById('camionModal')?.addEventListener('click', (e) => {
+        if (e.target?.id === 'camionModal') {
+          document.getElementById('camionModal').classList.add('hidden');
+        }
+      });
+
+      // Envío del formulario
+      document.getElementById('camionForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const camionData = {
+          matricula: formData.get('matricula'),
+          marca: formData.get('marca'),
+          modelo: formData.get('modelo'),
+          capacidad_kg: parseInt(formData.get('capacidad_kg')),
+          estado: formData.get('estado'),
+          conductor_id: formData.get('conductor_id') || null,
+          fecha_adquisicion: formData.get('fecha_adquisicion') || null
+        };
+
+        try {
+          const url = editingCamion ? `/api/camiones/${editingCamion.id}` : '/api/camiones';
+          const method = editingCamion ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(camionData)
+          });
+
+          if (response.ok) {
+            document.getElementById('camionModal').classList.add('hidden');
+            await loadData();
+          } else {
+            alert('Error al guardar el camión');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al guardar el camión');
+        }
       });
     }
 
-    function openModal(truck = null) {
-      editingTruck = truck;
-      const modal = document.getElementById('truckModal');
-      const title = document.getElementById('modalTitle');
-      const form = document.getElementById('truckForm');
+    // Función para manejar la búsqueda
+    function handleCamionSearch(filters) {
+      filteredCamiones = camiones.filter(camion => {
+        // Filtro por matrícula
+        if (filters.matricula && !camion.matricula?.toLowerCase().includes(filters.matricula.toLowerCase())) {
+          return false;
+        }
+        
+        // Filtro por marca
+        if (filters.marca && !camion.marca?.toLowerCase().includes(filters.marca.toLowerCase())) {
+          return false;
+        }
+        
+        // Filtro por modelo
+        if (filters.modelo && !camion.modelo?.toLowerCase().includes(filters.modelo.toLowerCase())) {
+          return false;
+        }
+        
+        // Filtro por estado
+        if (filters.estado && camion.estado !== filters.estado) {
+          return false;
+        }
+        
+        // Filtro por capacidad mínima
+        if (filters.capacidad && camion.capacidad_kg < parseInt(filters.capacidad)) {
+          return false;
+        }
+        
+        // Filtro por fecha de adquisición
+        if (filters.fecha_adquisicion) {
+          const fechaCamion = new Date(camion.fecha_adquisicion).toISOString().split('T')[0];
+          if (fechaCamion !== filters.fecha_adquisicion) {
+            return false;
+          }
+        }
+        
+        return true;
+      });
       
-      if (truck) {
+      updateTable();
+    }
+
+    function sortCamiones(column, direction) {
+      const sortOrder = direction === 'asc' ? 1 : -1;
+      
+      filteredCamiones.sort((a, b) => {
+        let valueA = a[column];
+        let valueB = b[column];
+        
+        // Manejo especial para fechas
+        if (column === 'fecha_adquisicion') {
+          valueA = new Date(valueA);
+          valueB = new Date(valueB);
+        }
+        
+        // Manejo especial para números
+        if (column === 'capacidad_kg') {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+        
+        // Manejo especial para strings
+        if (typeof valueA === 'string') {
+          valueA = valueA.toLowerCase();
+          valueB = valueB.toLowerCase();
+        }
+        
+        if (valueA < valueB) return -1 * sortOrder;
+        if (valueA > valueB) return 1 * sortOrder;
+        return 0;
+      });
+      
+      updateTable();
+    }
+
+    function updateTable() {
+      // Preparar datos para la tabla
+      const tableData = filteredCamiones.map(camion => ({
+        id: camion.id,
+        matricula: camion.matricula || '-',
+        marca: camion.marca || '-',
+        modelo: camion.modelo || '-',
+        conductor_nombre: camion.conductor_nombre || 'Sin asignar',
+        estado: camion.estado || 'Inactivo',
+        capacidad_kg: camion.capacidad_kg ? `${camion.capacidad_kg} kg` : '-'
+      }));
+
+      // Update table content directly
+      updateCamionTableContent(tableData, filteredCamiones.length);
+    }
+
+    function updateCamionTableContent(data, total) {
+      const tableContainer = document.querySelector('#camionTableContainer');
+      if (!tableContainer) return;
+
+      const tableHTML = `
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <span class="text-sm font-medium text-gray-700">
+              ${data.length > 0 ? `${((currentPage - 1) * pageSize) + 1}-${Math.min(currentPage * pageSize, total)} de ${total}` : '0 registros'}
+            </span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matrícula</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conductor</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Capacidad</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                ${data.length === 0 ? `
+                  <tr>
+                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                      <div class="flex flex-col items-center space-y-3">
+                        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+                        </svg>
+                        <p class="text-lg font-medium">No hay camiones</p>
+                        <p class="text-sm">Comienza agregando tu primer camión</p>
+                      </div>
+                    </td>
+                  </tr>
+                ` : data.map(camion => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${camion.matricula}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${camion.marca}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${camion.modelo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${camion.conductor_nombre}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        camion.estado === 'Activo' ? 'bg-green-100 text-green-800' : 
+                        camion.estado === 'Disponible' ? 'bg-blue-100 text-blue-800' :
+                        camion.estado === 'Mantenimiento' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }">
+                        ${camion.estado}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${camion.capacidad_kg}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                      <div class="flex items-center justify-center space-x-2">
+                        <button onclick="editCamion(${camion.id})" 
+                                class="text-blue-600 hover:text-blue-900 transition-colors">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                          </svg>
+                        </button>
+                        <button onclick="deleteCamion(${camion.id})" 
+                                class="text-red-600 hover:text-red-900 transition-colors">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      tableContainer.innerHTML = tableHTML;
+      setupCamionTableEventListeners();
+    }
+
+    function setupCamionTableEventListeners() {
+      // Setup pagination controls
+      const paginationContainer = document.querySelector('#paginationContainer');
+      if (paginationContainer) {
+        paginationContainer.innerHTML = `
+          <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-700">Mostrar</span>
+              <select id="pageSizeSelect" class="border border-gray-300 rounded-md px-2 py-1 text-sm">
+                <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
+                <option value="25" ${pageSize === 25 ? 'selected' : ''}>25</option>
+                <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+              </select>
+              <span class="text-sm text-gray-700">por página</span>
+            </div>
+            <div class="flex items-center space-x-1">
+              <button id="prevPage" ${currentPage === 1 ? 'disabled' : ''} 
+                      class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                Anterior
+              </button>
+              <span class="px-3 py-1 text-sm text-gray-700">
+                Página ${currentPage} de ${Math.ceil(filteredCamiones.length / pageSize)}
+              </span>
+              <button id="nextPage" ${currentPage >= Math.ceil(filteredCamiones.length / pageSize) ? 'disabled' : ''} 
+                      class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                Siguiente
+              </button>
+            </div>
+          </div>
+        `;
+
+        // Event listeners for pagination
+        document.getElementById('pageSizeSelect')?.addEventListener('change', (e) => {
+          pageSize = parseInt((e.target as HTMLSelectElement).value);
+          currentPage = 1;
+          updateTable();
+        });
+
+        document.getElementById('prevPage')?.addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--;
+            updateTable();
+          }
+        });
+
+        document.getElementById('nextPage')?.addEventListener('click', () => {
+          if (currentPage < Math.ceil(filteredCamiones.length / pageSize)) {
+            currentPage++;
+            updateTable();
+          }
+        });
+      }
+    }
+
+    /* COMMENTED OUT - DUPLICATE FUNCTION
+    function setupEventListeners() {
+      // Botón agregar camión
+      document.getElementById('addCamionBtn')?.addEventListener('click', () => {
+        openModal();
+      });
+
+      // Botón cancelar modal
+      document.getElementById('cancelBtn')?.addEventListener('click', () => {
+        closeModal();
+      });
+
+      // Form submit
+      document.getElementById('camionForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await saveCamion(e);
+      });
+
+      // Click fuera del modal para cerrar
+      document.getElementById('camionModal')?.addEventListener('click', (e) => {
+        if ((e.target as HTMLElement).id === 'camionModal') {
+          closeModal();
+        }
+      });
+    }
+
+    function openModal(camion = null) {
+      editingCamion = camion;
+      const modal = document.getElementById('camionModal');
+      const form = document.getElementById('camionForm') as HTMLFormElement;
+      const title = document.getElementById('modalTitle');
+      
+      if (camion) {
         title.textContent = 'Editar Camión';
-        form.querySelector('[name="nombre"]').value = truck.nombre;
+        // Llenar formulario con datos del camión
+        const matriculaInput = form.querySelector('[name="matricula"]') as HTMLInputElement;
+        const marcaInput = form.querySelector('[name="marca"]') as HTMLInputElement;
+        const modeloInput = form.querySelector('[name="modelo"]') as HTMLInputElement;
+        const capacidadInput = form.querySelector('[name="capacidad_kg"]') as HTMLInputElement;
+        const estadoSelect = form.querySelector('[name="estado"]') as HTMLSelectElement;
+        const conductorInput = form.querySelector('[name="conductor_nombre"]') as HTMLInputElement;
+        const fechaInput = form.querySelector('[name="fecha_adquisicion"]') as HTMLInputElement;
+        
+        if (matriculaInput) matriculaInput.value = camion.matricula || '';
+        if (marcaInput) marcaInput.value = camion.marca || '';
+        if (modeloInput) modeloInput.value = camion.modelo || '';
+        if (capacidadInput) capacidadInput.value = camion.capacidad_kg?.toString() || '';
+        if (estadoSelect) estadoSelect.value = camion.estado || '';
+        if (conductorInput) conductorInput.value = camion.conductor_nombre || '';
+        if (fechaInput && camion.fecha_adquisicion) {
+          fechaInput.value = new Date(camion.fecha_adquisicion).toISOString().split('T')[0];
+        }
       } else {
         title.textContent = 'Nuevo Camión';
         form.reset();
@@ -299,71 +746,88 @@ import MotionSimple from '../components/MotionSimple.astro';
     }
 
     function closeModal() {
-      const modal = document.getElementById('truckModal');
+      const modal = document.getElementById('camionModal');
       modal.classList.add('hidden');
       modal.classList.remove('flex');
-      editingTruck = null;
+      editingCamion = null;
     }
 
-    async function saveTruck(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(e.target);
-      const truckData = Object.fromEntries(formData.entries());
-      
+    async function saveCamion(e) {
       try {
-        const url = editingTruck ? `/api/camiones/${editingTruck.id}` : '/api/camiones';
-        const method = editingTruck ? 'PUT' : 'POST';
+        const formData = new FormData(e.target as HTMLFormElement);
+        const camionData = Object.fromEntries(formData);
+        
+        const url = editingCamion ? `/api/camiones/${editingCamion.id}` : '/api/camiones';
+        const method = editingCamion ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
           method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(truckData)
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(camionData)
         });
         
-        const data = await response.json();
+        const result = await response.json();
         
-        if (data.success) {
+        if (result.success) {
+          await loadData();
           closeModal();
-          await loadData(); // Reload data
+          showToast(editingCamion ? 'Camión actualizado exitosamente' : 'Camión creado exitosamente', 'success');
         } else {
-          alert('Error al guardar camión: ' + data.error);
+          showToast(result.message || 'Error al guardar camión', 'error');
         }
       } catch (error) {
-        console.error('Error saving truck:', error);
-        alert('Error de conexión');
+        console.error('Error saving camion:', error);
+        showToast('Error al guardar camión', 'error');
       }
     }
 
-    window.editTruck = function(truckId) {
-      const truck = trucks.find(t => t.id === truckId);
-      if (truck) {
-        openModal(truck);
+    function editCamion(camionId) {
+      const camion = camiones.find(c => c.id === camionId);
+      if (camion) {
+        openModal(camion);
       }
     }
 
-    window.deleteTruck = async function(truckId) {
-      const truck = trucks.find(t => t.id === truckId);
-      if (!truck) return;
+    function viewCamion(camionId) {
+      const camion = camiones.find(c => c.id === camionId);
+      if (camion) {
+        // Abrir modal de vista o navegar a página de detalle
+        console.log('Ver camión:', camion);
+      }
+    }
+
+    async function deleteCamion(camionId) {
+      if (!confirm('¿Estás seguro de que quieres eliminar este camión?')) {
+        return;
+      }
       
-      if (confirm(`¿Estás seguro de eliminar el camión de ${truck.nombre}?`)) {
-        try {
-          const response = await fetch(`/api/camiones/${truckId}`, {
-            method: 'DELETE'
-          });
-          
-          const data = await response.json();
-          
-          if (data.success) {
-            await loadData(); // Reload data
-          } else {
-            alert('Error al eliminar camión: ' + data.error);
-          }
-        } catch (error) {
-          console.error('Error deleting truck:', error);
-          alert('Error de conexión');
+      try {
+        const response = await fetch(`/api/camiones/${camionId}`, {
+          method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          await loadData();
+          showToast('Camión eliminado exitosamente', 'success');
+        } else {
+          showToast(result.message || 'Error al eliminar camión', 'error');
         }
+      } catch (error) {
+        console.error('Error deleting camion:', error);
+        showToast('Error al eliminar camión', 'error');
       }
     }
+
+    function showToast(message, type = 'info') {
+      const toastEvent = new CustomEvent('showToast', {
+        detail: { message, type }
+      });
+      document.dispatchEvent(toastEvent);
+    }
+    */
   </script>
 </Layout>

@@ -1,0 +1,225 @@
+---
+interface Props {
+  title: string;
+  type: 'line' | 'bar' | 'doughnut' | 'pie';
+  data: any;
+  height?: number;
+  color?: 'blue' | 'green' | 'yellow' | 'red' | 'purple';
+  isLoading?: boolean;
+}
+
+const { 
+  title, 
+  type, 
+  data, 
+  height = 300,
+  color = 'blue',
+  isLoading = false 
+} = Astro.props;
+
+// Generate unique ID for each chart
+const chartId = `chart-${title.toLowerCase().replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 9)}`;
+
+// Color schemes
+const colorSchemes = {
+  blue: {
+    primary: 'rgba(59, 130, 246, 0.8)',
+    primaryBorder: 'rgba(59, 130, 246, 1)',
+    secondary: 'rgba(147, 197, 253, 0.8)',
+    gradient: ['rgba(59, 130, 246, 0.8)', 'rgba(147, 197, 253, 0.8)', 'rgba(191, 219, 254, 0.8)']
+  },
+  green: {
+    primary: 'rgba(34, 197, 94, 0.8)',
+    primaryBorder: 'rgba(34, 197, 94, 1)',
+    secondary: 'rgba(134, 239, 172, 0.8)',
+    gradient: ['rgba(34, 197, 94, 0.8)', 'rgba(134, 239, 172, 0.8)', 'rgba(187, 247, 208, 0.8)']
+  },
+  yellow: {
+    primary: 'rgba(234, 179, 8, 0.8)',
+    primaryBorder: 'rgba(234, 179, 8, 1)',
+    secondary: 'rgba(253, 224, 71, 0.8)',
+    gradient: ['rgba(234, 179, 8, 0.8)', 'rgba(253, 224, 71, 0.8)', 'rgba(254, 240, 138, 0.8)']
+  },
+  red: {
+    primary: 'rgba(239, 68, 68, 0.8)',
+    primaryBorder: 'rgba(239, 68, 68, 1)',
+    secondary: 'rgba(252, 165, 165, 0.8)',
+    gradient: ['rgba(239, 68, 68, 0.8)', 'rgba(252, 165, 165, 0.8)', 'rgba(254, 202, 202, 0.8)']
+  },
+  purple: {
+    primary: 'rgba(147, 51, 234, 0.8)',
+    primaryBorder: 'rgba(147, 51, 234, 1)',
+    secondary: 'rgba(196, 181, 253, 0.8)',
+    gradient: ['rgba(147, 51, 234, 0.8)', 'rgba(196, 181, 253, 0.8)', 'rgba(221, 214, 254, 0.8)']
+  }
+};
+
+const currentColors = colorSchemes[color];
+---
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-300" data-motion="fade-up">
+  <!-- Chart Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-semibold text-gray-900">{title}</h3>
+    <div class="flex items-center space-x-2">
+      <!-- Options menu -->
+      <button class="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Chart Container -->
+  <div class="relative" style={`height: ${height}px`}>
+    {isLoading ? (
+      <div class="flex items-center justify-center h-full">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    ) : (
+      <canvas id={chartId} class="w-full h-full"></canvas>
+    )}
+  </div>
+  
+  <!-- Chart Legend/Info -->
+  <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
+    <span>Actualizado hace 2 min</span>
+    <button class="flex items-center space-x-1 hover:text-blue-600 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+      </svg>
+      <span>Exportar</span>
+    </button>
+  </div>
+</div>
+
+<script define:vars={{ chartId, type, data, currentColors, height }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Check if Chart.js is loaded via CDN
+    if (typeof Chart === 'undefined') {
+      console.warn('Chart.js no está disponible. Cargando desde CDN...');
+      
+      // Load Chart.js from CDN
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js';
+      script.onload = () => {
+        initChart();
+      };
+      document.head.appendChild(script);
+    } else {
+      initChart();
+    }
+    
+    function initChart() {
+      const ctx = document.getElementById(chartId);
+      if (!ctx) return;
+      
+      // Default chart options
+      const defaultOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: type === 'doughnut' || type === 'pie',
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: {
+                size: 12
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: 'white',
+            bodyColor: 'white',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true,
+            intersect: false,
+            mode: 'index'
+          }
+        },
+        scales: type !== 'doughnut' && type !== 'pie' ? {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: '#6B7280',
+              font: {
+                size: 11
+              }
+            }
+          },
+          y: {
+            grid: {
+              color: 'rgba(107, 114, 128, 0.1)'
+            },
+            ticks: {
+              color: '#6B7280',
+              font: {
+                size: 11
+              }
+            }
+          }
+        } : {},
+        animation: {
+          duration: 1000,
+          easing: 'easeInOutQuart'
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      };
+      
+      // Prepare chart data with colors
+      let chartData = { ...data };
+      
+      if (type === 'line') {
+        chartData.datasets = chartData.datasets.map((dataset, index) => ({
+          ...dataset,
+          borderColor: currentColors.primaryBorder,
+          backgroundColor: currentColors.primary,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: currentColors.primaryBorder,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }));
+      } else if (type === 'bar') {
+        chartData.datasets = chartData.datasets.map((dataset, index) => ({
+          ...dataset,
+          backgroundColor: currentColors.gradient[index] || currentColors.primary,
+          borderColor: currentColors.primaryBorder,
+          borderWidth: 1,
+          borderRadius: 4,
+          borderSkipped: false
+        }));
+      } else if (type === 'doughnut' || type === 'pie') {
+        chartData.datasets = chartData.datasets.map(dataset => ({
+          ...dataset,
+          backgroundColor: currentColors.gradient,
+          borderColor: '#ffffff',
+          borderWidth: 2
+        }));
+      }
+      
+      // Create chart
+      const chart = new Chart(ctx, {
+        type: type,
+        data: chartData,
+        options: defaultOptions
+      });
+      
+      // Store chart instance for future reference
+      window[`chart_${chartId}`] = chart;
+    }
+  });
+</script>
