@@ -1,166 +1,40 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
-import MotionSimple from '../components/MotionSimple.astro';
-import AdvancedSearch from '../components/search/AdvancedSearch.astro';
-import EnhancedTable from '../components/search/EnhancedTable.astro';
-
-// Configuración de campos de búsqueda para clientes
-const searchFields = [
-  {
-    key: 'nombre',
-    label: 'Nombre',
-    type: 'text' as const,
-    placeholder: 'Buscar por nombre...'
-  },
-  {
-    key: 'email',
-    label: 'Email',
-    type: 'text' as const,
-    placeholder: 'Buscar por email...'
-  },
-  {
-    key: 'telefono',
-    label: 'Teléfono',
-    type: 'text' as const,
-    placeholder: 'Buscar por teléfono...'
-  },
-  {
-    key: 'estado',
-    label: 'Estado',
-    type: 'select' as const,
-    options: [
-      { value: 'Activo', label: 'Activo' },
-      { value: 'Inactivo', label: 'Inactivo' }
-    ]
-  },
-  {
-    key: 'ciudad',
-    label: 'Ciudad',
-    type: 'select' as const,
-    options: [
-      { value: 'Montevideo', label: 'Montevideo' },
-      { value: 'Canelones', label: 'Canelones' },
-      { value: 'Maldonado', label: 'Maldonado' },
-      { value: 'Colonia', label: 'Colonia' }
-    ]
-  },
-  {
-    key: 'fecha_registro',
-    label: 'Fecha de Registro',
-    type: 'date' as const
-  }
-];
-
-// Configuración de columnas para la tabla
-const tableColumns = [
-  {
-    key: 'nombre',
-    label: 'Nombre',
-    sortable: true,
-    type: 'text' as const
-  },
-  {
-    key: 'email',
-    label: 'Email',
-    sortable: true,
-    type: 'text' as const
-  },
-  {
-    key: 'telefono',
-    label: 'Teléfono',
-    sortable: false,
-    type: 'text' as const
-  },
-  {
-    key: 'direccion',
-    label: 'Dirección',
-    sortable: false,
-    type: 'text' as const,
-    width: '200px'
-  },
-  {
-    key: 'estado',
-    label: 'Estado',
-    sortable: true,
-    type: 'badge' as const,
-    align: 'center' as const
-  },
-  {
-    key: 'fecha_registro',
-    label: 'Fecha de Registro',
-    sortable: true,
-    type: 'date' as const,
-    align: 'center' as const
-  },
-  {
-    key: 'actions',
-    label: 'Acciones',
-    sortable: false,
-    type: 'actions' as const,
-    align: 'center' as const,
-    width: '120px'
-  }
-];
+import LoadingSpinner from '../components/LoadingSpinner.astro';
 ---
 
-<Layout title="Gestión de Clientes - Sistema de Repartos">
-  <MotionSimple />
-  <div id="app" class="min-h-screen bg-gray-50">
-    <!-- Loading state -->
-    <div id="loading" class="flex items-center justify-center min-h-screen">
-      <div class="flex flex-col items-center space-y-4">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <p class="text-gray-600 font-medium">Cargando clientes...</p>
-      </div>
+<Layout title="Clientes - Sistema de Gestión">
+  <Navigation currentPage="clientes" />
+  
+  <LoadingSpinner message="Cargando clientes..." />
+
+  <main id="mainContent" class="max-w-7xl mx-auto px-6 lg:px-8 py-8 hidden">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Gestión de Clientes</h1>
+      <p class="text-gray-600">Administra tu base de clientes</p>
     </div>
-
-    <!-- Main content -->
-    <div id="mainContent" class="hidden">
-      <Navigation currentPage="clientes" />
-
-      <!-- Content -->
-      <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        <!-- Header de página con animación -->
-        <div class="flex justify-between items-center mb-8" data-motion="fade-up" data-delay="0">
-          <div data-motion="fade-right" data-delay="100">
-            <h2 class="text-3xl font-bold text-gray-900" style="font-family: Inter;">Gestión de Clientes</h2>
-            <p class="text-gray-600 mt-2">Administra tu cartera de clientes y sus ubicaciones</p>
-          </div>
-          <button 
-            id="addClientBtn"
-            class="btn-primary motion-hover-scale"
-            data-motion="fade-left" data-delay="200"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-            Nuevo Cliente
-          </button>
-        </div>
-
-        <!-- Búsqueda Avanzada -->
-        <AdvancedSearch 
-          searchFields={searchFields}
-          onSearch="handleClientSearch"
-        />
 
         <!-- Tabla de Clientes -->
-        <div id="clientTableContainer">
-          <EnhancedTable 
-            columns={tableColumns}
-            data={[]}
-            loading={true}
-            selectable={true}
-            pagination={{
-              current: 1,
-              total: 0,
-              pageSize: 25
-            }}
-          />
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-medium text-gray-900">Clientes</h2>
+              <button id="newClientBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Nuevo Cliente
+              </button>
+            </div>
+          </div>
+          <div id="clientTableContainer" class="p-6">
+            <div class="text-center py-8">
+              <p class="text-gray-500">Cargando clientes...</p>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+    </main>
 
     <!-- Add/Edit Client Modal -->
     <div id="clientModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4">
@@ -171,52 +45,28 @@ const tableColumns = [
         <form id="clientForm" class="px-6 py-4 space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Código Alternativo</label>
-              <input type="text" name="codigoalte" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre/Razón Social *</label>
+              <input type="text" name="nombre" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
-              <input type="text" name="rut" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Razón Social *</label>
-            <input type="text" name="razonsocial" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-            <input type="text" name="nombre" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
-            <textarea name="direccion" required rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-            <input type="text" name="telefono" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Latitud</label>
-              <input type="number" step="any" name="latitud" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Longitud</label>
-              <input type="number" step="any" name="longitud" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+              <input type="tel" name="telefono" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+              <select name="estado" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+              </select>
             </div>
           </div>
-          
-          <div id="editOnlyFields" class="hidden">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-            <select name="estado" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-              <option value="Activo">Activo</option>
-              <option value="Inactivo">Inactivo</option>
-            </select>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+            <textarea name="direccion" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
           </div>
         </form>
         
@@ -224,7 +74,7 @@ const tableColumns = [
           <button id="cancelBtn" type="button" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
             Cancelar
           </button>
-          <button id="saveBtn" type="submit" form="clientForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+          <button type="submit" form="clientForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
             Guardar
           </button>
         </div>
@@ -234,25 +84,13 @@ const tableColumns = [
 
   <script>
     let clients = [];
-    let filteredClients = [];
-    let currentFilters = {};
-    let currentPage = 1;
-    let pageSize = 25;
-    let currentSort = { key: '', direction: 'asc' };
-
-    // Definición de columnas de la tabla
-    const tableColumns = [
-      { key: 'nombre', label: 'Cliente', sortable: true },
-      { key: 'email', label: 'Email', sortable: true },
-      { key: 'telefono', label: 'Teléfono', sortable: false },
-      { key: 'direccion', label: 'Dirección', sortable: false },
-      { key: 'estado', label: 'Estado', sortable: true },
-      { key: 'fecha_registro', label: 'Fecha Registro', sortable: true },
-      { key: 'actions', label: 'Acciones', sortable: false }
-    ];
+    let editingClient = null;
 
     // Initialize the page
     document.addEventListener('DOMContentLoaded', async () => {
+      const startTime = Date.now();
+      const minLoadingTime = 1000; // Tiempo mínimo de loading: 1 segundo
+      
       try {
         await checkAuth();
         await loadClients();
@@ -260,16 +98,29 @@ const tableColumns = [
         
       } catch (error) {
         console.error('Initialization error:', error);
-        showToast('Error al inicializar la página', 'error');
       } finally {
-        // Siempre mostrar el contenido después de intentar cargar
+        // Asegurar tiempo mínimo de loading para mejor UX
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+        
         setTimeout(() => {
           const loading = document.getElementById('loading');
           const mainContent = document.getElementById('mainContent');
           
-          if (loading) loading.classList.add('hidden');
-          if (mainContent) mainContent.classList.remove('hidden');
-        }, 800);
+          if (loading) {
+            loading.style.opacity = '0';
+            setTimeout(() => {
+              loading.classList.add('hidden');
+            }, 300);
+          }
+          if (mainContent) {
+            mainContent.classList.remove('hidden');
+            mainContent.style.opacity = '0';
+            setTimeout(() => {
+              mainContent.style.opacity = '1';
+            }, 50);
+          }
+        }, remainingTime);
       }
     });
 
@@ -290,445 +141,189 @@ const tableColumns = [
 
     async function loadClients() {
       try {
-        console.log('Loading clients from API...');
         const response = await fetch('/api/clientes');
+        const result = await response.json();
         
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('API Response:', data);
-        
-        // Manejar diferentes estructuras de respuesta
-        let clientsArray = [];
-        
-        if (data && data.success && Array.isArray(data.clientes)) {
-          clientsArray = data.clientes;
-        } else if (data && Array.isArray(data.data)) {
-          clientsArray = data.data;
-        } else if (Array.isArray(data)) {
-          clientsArray = data;
+        if (result.success) {
+          clients = result.data || [];
+          renderClientsTable();
         } else {
-          console.warn('Unexpected API response structure:', data);
-          showToast('Estructura de datos inesperada de la API', 'warning');
-          clientsArray = [];
+          console.error('Error loading clients:', result.message);
         }
-        
-        clients = clientsArray.map(client => ({
-          ...client,
-          id: client.id || Math.random().toString(36).substr(2, 9),
-          fecha_registro: client.fecha_registro ? new Date(client.fecha_registro).toISOString().split('T')[0] : '',
-          estado: client.estado || 'Activo',
-          email: client.email || '',
-          telefono: client.telefono || '',
-          direccion: client.direccion || '',
-          nombre: client.nombre || client.razonsocial || 'Sin nombre',
-          codigoalte: client.codigoalte || ''
-        }));
-        
-        console.log('Processed clients:', clients.length);
-        
-        if (clients.length === 0) {
-          showToast('No se encontraron clientes', 'info');
-        } else {
-          showToast(`${clients.length} clientes cargados`, 'success');
-        }
-        
-        applyFiltersAndSort();
         
       } catch (error) {
         console.error('Error loading clients:', error);
-        showToast('Error al cargar clientes: ' + error.message, 'error');
-        
-        // Inicializar con array vacío en caso de error
         clients = [];
-        filteredClients = [];
-        updateTable();
+        renderClientsTable();
       }
     }
 
-    function applyFiltersAndSort() {
-      try {
-        // Apply filters
-        filteredClients = clients.filter(client => {
-          return Object.keys(currentFilters).every(key => {
-            const filterValue = currentFilters[key];
-            if (!filterValue) return true;
-            
-            const clientValue = client[key]?.toString().toLowerCase() || '';
-            return clientValue.includes(filterValue.toLowerCase());
-          });
-        });
+    function renderClientsTable() {
+      const container = document.getElementById('clientTableContainer');
+      if (!container) return;
 
-        // Apply sorting
-        if (currentSort.key) {
-          filteredClients.sort((a, b) => {
-            let aVal = a[currentSort.key] || '';
-            let bVal = b[currentSort.key] || '';
-            
-            if (currentSort.direction === 'desc') {
-              [aVal, bVal] = [bVal, aVal];
-            }
-            
-            return aVal.toString().localeCompare(bVal.toString());
-          });
-        }
-
-        updateTable();
-      } catch (error) {
-        console.error('Error applying filters and sort:', error);
-        showToast('Error al procesar filtros', 'error');
+      if (clients.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <p class="text-lg font-medium text-gray-900">No hay clientes</p>
+            <p class="text-gray-500">Comienza agregando tu primer cliente</p>
+          </div>
+        `;
+        return;
       }
-    }
 
-    function updateTable() {
-      try {
-        // Calculate pagination
-        const total = filteredClients.length;
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        const pageData = filteredClients.slice(startIndex, endIndex);
-
-        console.log('Table update:', {
-          total: total,
-          currentPage: currentPage,
-          pageSize: pageSize,
-          pageData: pageData.length
-        });
-
-        // Update table content directly since Astro components are static
-        updateTableContent(pageData, total);
-
-      } catch (error) {
-        console.error('Error updating table:', error);
-        showToast('Error al actualizar tabla', 'error');
-      }
-    }
-
-    function updateTableContent(data, total) {
-      const tableContainer = document.querySelector('#clientTableContainer');
-      if (!tableContainer) return;
-
-      // Create table HTML
       const tableHTML = `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <!-- Table Header -->
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-4">
-                <span class="text-sm font-medium text-gray-700">
-                  ${data.length > 0 ? `${((currentPage - 1) * pageSize) + 1}-${Math.min(currentPage * pageSize, total)} de ${total}` : '0 registros'}
-                </span>
-              </div>
-              <div class="flex items-center space-x-2">
-                <select id="densitySelect" class="text-xs border-gray-300 rounded-md">
-                  <option value="compact">Compacto</option>
-                  <option value="normal" selected>Normal</option>
-                  <option value="comfortable">Cómodo</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Table Content -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              ${clients.map(client => `
                 <tr>
-                  ${tableColumns.map(col => `
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" 
-                        data-sort="${col.key}">
-                      <div class="flex items-center space-x-1">
-                        <span>${col.label}</span>
-                        ${col.sortable ? '<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>' : ''}
-                      </div>
-                    </th>
-                  `).join('')}
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    ${client.nombre || client.razonsocial || 'Sin nombre'}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${client.email || '-'}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${client.telefono || '-'}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      client.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }">
+                      ${client.estado || 'Activo'}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <button onclick="editClient(${client.id})" class="text-blue-600 hover:text-blue-900 mr-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button onclick="deleteClient(${client.id})" class="text-red-600 hover:text-red-900">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                ${data.length === 0 ? `
-                  <tr>
-                    <td colspan="${tableColumns.length}" class="px-6 py-12 text-center text-gray-500">
-                      <div class="flex flex-col items-center space-y-3">
-                        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8l-4 4"></path>
-                        </svg>
-                        <p class="text-lg font-medium">No hay clientes</p>
-                        <p class="text-sm">Comienza agregando tu primer cliente</p>
-                      </div>
-                    </td>
-                  </tr>
-                ` : data.map(client => `
-                  <tr class="hover:bg-gray-50 cursor-pointer" onclick="editClient(${client.id})">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="font-medium text-gray-900">${client.nombre || client.razonsocial || 'Sin nombre'}</div>
-                      ${client.codigoalte ? `<div class="text-xs text-gray-500">${client.codigoalte}</div>` : ''}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${client.email || '-'}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${client.telefono || '-'}
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                      ${client.direccion || '-'}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        client.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }">
-                        ${client.estado || 'Activo'}
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
-                      ${client.fecha_registro || '-'}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <div class="flex items-center justify-center space-x-2">
-                        <button onclick="event.stopPropagation(); editClient(${client.id})" 
-                                class="text-blue-600 hover:text-blue-900 transition-colors">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                          </svg>
-                        </button>
-                        <button onclick="event.stopPropagation(); toggleClientStatus(${client.id})" 
-                                class="text-red-600 hover:text-red-900 transition-colors">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination -->
-          ${total > pageSize ? `
-            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <label class="text-sm text-gray-600">Registros por página:</label>
-                  <select id="pageSizeSelect" class="border-gray-300 rounded-md text-sm">
-                    <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
-                    <option value="25" ${pageSize === 25 ? 'selected' : ''}>25</option>
-                    <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
-                    <option value="100" ${pageSize === 100 ? 'selected' : ''}>100</option>
-                  </select>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <button id="prevPage" ${currentPage === 1 ? 'disabled' : ''} 
-                          class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                    Anterior
-                  </button>
-                  <span class="text-sm text-gray-600">
-                    Página ${currentPage} de ${Math.ceil(total / pageSize)}
-                  </span>
-                  <button id="nextPage" ${currentPage >= Math.ceil(total / pageSize) ? 'disabled' : ''} 
-                          class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                    Siguiente
-                  </button>
-                </div>
-              </div>
-            </div>
-          ` : ''}
+              `).join('')}
+            </tbody>
+          </table>
         </div>
       `;
 
-      tableContainer.innerHTML = tableHTML;
-
-      // Add event listeners for pagination and sorting
-      setupTableEventListeners();
-    }
-
-    function setupTableEventListeners() {
-      // Pagination events
-      const prevBtn = document.getElementById('prevPage');
-      const nextBtn = document.getElementById('nextPage');
-      const pageSizeSelect = document.getElementById('pageSizeSelect');
-
-      if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-          if (currentPage > 1) {
-            currentPage--;
-            applyFiltersAndSort();
-          }
-        });
-      }
-
-      if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-          const totalPages = Math.ceil(filteredClients.length / pageSize);
-          if (currentPage < totalPages) {
-            currentPage++;
-            applyFiltersAndSort();
-          }
-        });
-      }
-
-      if (pageSizeSelect) {
-        pageSizeSelect.addEventListener('change', (e) => {
-          pageSize = parseInt((e.target as HTMLSelectElement).value);
-          currentPage = 1;
-          applyFiltersAndSort();
-        });
-      }
-
-      // Sorting events
-      const sortHeaders = document.querySelectorAll('[data-sort]');
-      sortHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-          const sortKey = (header as HTMLElement).dataset.sort;
-          if (currentSort.key === sortKey) {
-            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-          } else {
-            currentSort = { key: sortKey, direction: 'asc' };
-          }
-          applyFiltersAndSort();
-        });
-      });
+      container.innerHTML = tableHTML;
     }
 
     function setupEventListeners() {
-      // Advanced search handler - simplified
-      window.handleClientSearch = function(filters) {
-        currentFilters = filters;
-        currentPage = 1;
-        applyFiltersAndSort();
-      };
+      // Botón nuevo cliente
+      document.getElementById('newClientBtn')?.addEventListener('click', () => {
+        editingClient = null;
+        document.getElementById('modalTitle').textContent = 'Nuevo Cliente';
+        const form = document.getElementById('clientForm') as HTMLFormElement;
+        if (form) form.reset();
+        document.getElementById('clientModal')?.classList.remove('hidden');
+      });
 
-      // Modal controls
-      document.getElementById('addClientBtn')?.addEventListener('click', () => openModal());
-      document.getElementById('cancelBtn')?.addEventListener('click', closeModal);
-      document.getElementById('clientForm')?.addEventListener('submit', saveClient);
-    }
+      // Cerrar modal
+      document.getElementById('cancelBtn')?.addEventListener('click', () => {
+        document.getElementById('clientModal')?.classList.add('hidden');
+      });
 
-    // Modal functions
-    function openModal(client = null) {
-      const modal = document.getElementById('clientModal');
-      const form = document.getElementById('clientForm');
-      const title = document.getElementById('modalTitle');
-      
-      if (client) {
-        title.textContent = 'Editar Cliente';
-        form.dataset.clientId = client.id;
+      // Submit formulario
+      document.getElementById('clientForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        // Fill form with client data
-        Object.keys(client).forEach(key => {
-          const input = form.querySelector(`[name="${key}"]`);
-          if (input) {
-            input.value = client[key] || '';
+        const formData = new FormData(e.target as HTMLFormElement);
+        const clientData = Object.fromEntries(formData);
+
+        try {
+          const url = editingClient ? `/api/clientes/${editingClient.id}` : '/api/clientes';
+          const method = editingClient ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(clientData)
+          });
+
+          if (response.ok) {
+            document.getElementById('clientModal')?.classList.add('hidden');
+            await loadClients();
+          } else {
+            alert('Error al guardar el cliente');
           }
-        });
-      } else {
-        title.textContent = 'Nuevo Cliente';
-        delete form.dataset.clientId;
-        form.reset();
-      }
-      
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeModal() {
-      const modal = document.getElementById('clientModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    async function saveClient(e) {
-      e.preventDefault();
-      
-      const form = e.target;
-      const formData = new FormData(form);
-      const clientData = Object.fromEntries(formData.entries());
-      
-      // Convert coordinates to numbers
-      if (clientData.latitud) clientData.latitud = parseFloat(clientData.latitud.toString());
-      if (clientData.longitud) clientData.longitud = parseFloat(clientData.longitud.toString());
-      
-      const isEdit = form.dataset.clientId;
-      const url = isEdit ? '/api/clientes/' + form.dataset.clientId : '/api/clientes';
-      const method = isEdit ? 'PUT' : 'POST';
-      
-      try {
-        const response = await fetch(url, {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(clientData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          closeModal();
-          showToast(isEdit ? 'Cliente actualizado' : 'Cliente creado', 'success');
-          await loadClients();
-        } else {
-          showToast(data.message || 'Error al guardar cliente', 'error');
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al guardar el cliente');
         }
-      } catch (error) {
-        console.error('Error saving client:', error);
-        showToast('Error al guardar cliente', 'error');
-      }
+      });
     }
 
-    // Global functions for table actions
+    // Global functions
     window.editClient = function(clientId) {
       const client = clients.find(c => c.id === clientId);
       if (client) {
-        openModal(client);
-      }
-    };
-
-    window.toggleClientStatus = async function(clientId) {
-      try {
-        const response = await fetch('/api/clientes/' + clientId, {
-          method: 'DELETE'
-        });
+        editingClient = client;
+        document.getElementById('modalTitle').textContent = 'Editar Cliente';
         
-        const data = await response.json();
-        
-        if (data.success) {
-          showToast('Estado del cliente actualizado', 'success');
-          await loadClients();
-        } else {
-          showToast(data.message || 'Error al actualizar estado', 'error');
+        // Fill form
+        const form = document.getElementById('clientForm');
+        if (form) {
+          const inputs = form.querySelectorAll('input, select, textarea');
+          inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name && client[name]) {
+              input.value = client[name];
+            }
+          });
         }
-      } catch (error) {
-        console.error('Error toggling client status:', error);
-        showToast('Error al actualizar estado', 'error');
+        
+        document.getElementById('clientModal')?.classList.remove('hidden');
       }
     };
 
-    function showToast(message, type = 'info') {
-      const existingToast = document.querySelector('.client-toast');
-      if (existingToast) existingToast.remove();
-      
-      const toast = document.createElement('div');
-      toast.className = 'client-toast fixed top-4 right-4 px-4 py-2 rounded-lg text-white text-sm font-medium z-50 transform transition-all duration-300 translate-x-full';
-      
-      const colors = {
-        success: 'bg-green-500',
-        warning: 'bg-yellow-500',
-        error: 'bg-red-500',
-        info: 'bg-blue-500'
-      };
-      
-      toast.classList.add(colors[type] || colors.info);
-      toast.textContent = message;
-      
-      document.body.appendChild(toast);
-      
-      setTimeout(() => toast.classList.remove('translate-x-full'), 100);
-      setTimeout(() => {
-        toast.classList.add('translate-x-full');
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
+    window.deleteClient = async function(clientId) {
+      if (confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
+        try {
+          const response = await fetch(`/api/clientes/${clientId}`, {
+            method: 'DELETE'
+          });
+
+          if (response.ok) {
+            await loadClients();
+          } else {
+            alert('Error al eliminar el cliente');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al eliminar el cliente');
+        }
+      }
+    };
   </script>
+
+  <style>
+    /* Transiciones suaves para el loading */
+    #mainContent {
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    #loading {
+      transition: opacity 0.3s ease-in-out;
+    }
+  </style>
 </Layout>

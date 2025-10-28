@@ -1,144 +1,27 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
-import MotionSimple from '../components/MotionSimple.astro';
-import AdvancedSearch from '../components/search/AdvancedSearch.astro';
-import EnhancedTable from '../components/search/EnhancedTable.astro';
-
-// Configuración de campos de búsqueda para repartos
-const searchFields = [
-  {
-    key: 'cliente_nombre',
-    label: 'Cliente',
-    type: 'text' as const,
-    placeholder: 'Buscar por cliente...'
-  },
-  {
-    key: 'direccion_entrega',
-    label: 'Dirección',
-    type: 'text' as const,
-    placeholder: 'Buscar por dirección...'
-  },
-  {
-    key: 'estado',
-    label: 'Estado',
-    type: 'select' as const,
-    options: [
-      { value: 'programado', label: 'Programado' },
-      { value: 'en_curso', label: 'En Curso' },
-      { value: 'completado', label: 'Completado' },
-      { value: 'cancelado', label: 'Cancelado' }
-    ]
-  },
-  {
-    key: 'fecha_entrega',
-    label: 'Fecha de Entrega',
-    type: 'date' as const
-  },
-  {
-    key: 'ruta',
-    label: 'Ruta',
-    type: 'text' as const,
-    placeholder: 'Buscar por ruta...'
-  }
-];
-
-// Configuración de columnas para la tabla
-const tableColumns = [
-  {
-    key: 'cliente_nombre',
-    label: 'Cliente',
-    sortable: true,
-    type: 'text' as const
-  },
-  {
-    key: 'direccion_entrega',
-    label: 'Dirección',
-    sortable: false,
-    type: 'text' as const,
-    width: '200px'
-  },
-  {
-    key: 'fecha_entrega',
-    label: 'Fecha',
-    sortable: true,
-    type: 'date' as const,
-    align: 'center' as const
-  },
-  {
-    key: 'ruta_nombre',
-    label: 'Ruta',
-    sortable: true,
-    type: 'text' as const,
-    align: 'center' as const
-  },
-  {
-    key: 'estado',
-    label: 'Estado',
-    sortable: true,
-    type: 'badge' as const,
-    align: 'center' as const
-  },
-  {
-    key: 'camion_matricula',
-    label: 'Camión',
-    sortable: true,
-    type: 'text' as const,
-    align: 'center' as const
-  },
-  {
-    key: 'actions',
-    label: 'Acciones',
-    sortable: false,
-    type: 'actions' as const,
-    align: 'center' as const,
-    width: '120px'
-  }
-];
+import LoadingSpinner from '../components/LoadingSpinner.astro';
 ---
 
-<Layout title="Gestión de Repartos - Sistema de Repartos">
-  <MotionSimple />
-  <div id="app" class="min-h-screen bg-gray-50">
-    <!-- Loading state -->
-    <div id="loading" class="flex items-center justify-center min-h-screen">
-      <div class="flex flex-col items-center space-y-4">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <p class="text-gray-600 font-medium">Cargando repartos...</p>
-      </div>
+<Layout title="Repartos - Sistema de Gestión">
+  <Navigation currentPage="repartos" />
+  
+  <LoadingSpinner message="Cargando repartos..." />
+
+  <main id="mainContent" class="max-w-7xl mx-auto px-6 lg:px-8 py-8 hidden">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Gestión de Repartos</h1>
+      <p class="text-gray-600">Administra las entregas y rutas de distribución</p>
     </div>
 
-    <!-- Main content -->
-    <div id="mainContent" class="hidden">
-      <Navigation currentPage="repartos" />
-
-      <!-- Content -->
-      <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        <!-- Header de página -->
-        <div class="flex justify-between items-center mb-8" data-motion="fade-up" data-delay="0">
-          <div data-motion="fade-right" data-delay="100">
-            <h2 class="text-3xl font-bold text-gray-900" style="font-family: Inter;">Gestión de Repartos</h2>
-            <p class="text-gray-600 mt-2">Administra entregas y rutas de distribución</p>
-          </div>
-          <button 
-            id="addRepartoBtn"
-            class="btn-primary motion-hover-scale"
-            data-motion="fade-left" data-delay="200"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-            Nuevo Reparto
-          </button>
-        </div>
-
-        <!-- Estadísticas rápidas -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-motion="fade-up" data-delay="300">
-          <div class="bg-white rounded-lg shadow p-6 motion-hover-card" data-motion="fade-up" data-delay="350">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-600 mb-1">Total Repartos</p>
-                <p id="totalRepartos" class="text-2xl font-bold text-gray-900" style="font-family: Inter;">0</p>
+                <p class="text-sm font-medium text-gray-600 mb-1">Total</p>
+                <p id="totalRepartos" class="text-2xl font-bold text-blue-600">0</p>
               </div>
               <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,25 +31,25 @@ const tableColumns = [
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6 motion-hover-card" data-motion="fade-up" data-delay="400">
+          <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-600 mb-1">Programados</p>
-                <p id="programadosRepartos" class="text-2xl font-bold text-blue-600" style="font-family: Inter;">0</p>
+                <p class="text-sm font-medium text-gray-600 mb-1">Pendientes</p>
+                <p id="pendientesRepartos" class="text-2xl font-bold text-yellow-600">0</p>
               </div>
-              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6 motion-hover-card" data-motion="fade-up" data-delay="450">
+          <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600 mb-1">En Curso</p>
-                <p id="enCursoRepartos" class="text-2xl font-bold text-orange-600" style="font-family: Inter;">0</p>
+                <p id="enCursoRepartos" class="text-2xl font-bold text-orange-600">0</p>
               </div>
               <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,11 +59,11 @@ const tableColumns = [
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6 motion-hover-card" data-motion="fade-up" data-delay="500">
+          <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600 mb-1">Completados</p>
-                <p id="completadosRepartos" class="text-2xl font-bold text-green-600" style="font-family: Inter;">0</p>
+                <p id="completadosRepartos" class="text-2xl font-bold text-green-600">0</p>
               </div>
               <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,31 +74,26 @@ const tableColumns = [
           </div>
         </div>
 
-        <!-- Búsqueda Avanzada -->
-        <AdvancedSearch 
-          searchFields={searchFields}
-          onSearch="handleRepartoSearch"
-        />
-
         <!-- Tabla de Repartos -->
-        <div id="repartoTableContainer">
-          <EnhancedTable 
-            columns={tableColumns}
-            data={[]}
-            loading={true}
-            selectable={true}
-            pagination={{
-              current: 1,
-              total: 0,
-              pageSize: 25
-            }}
-          />
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-medium text-gray-900">Repartos</h2>
+              <button id="newRepartoBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Nuevo Reparto
+              </button>
+            </div>
+          </div>
+          <div id="repartoTableContainer" class="p-6">
+            <div class="text-center py-8">
+              <p class="text-gray-500">Cargando repartos...</p>
+            </div>
+          </div>
         </div>
-        
-        <!-- Paginación -->
-        <div id="paginationContainer"></div>
-      </main>
-    </div>
+    </main>
 
     <!-- Add/Edit Reparto Modal -->
     <div id="repartoModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4">
@@ -223,26 +101,41 @@ const tableColumns = [
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Nuevo Reparto</h3>
         </div>
-        <form id="repartoForm" class="px-6 py-4 space-y-6">
+        <form id="repartoForm" class="px-6 py-4 space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Ruta *</label>
-              <select name="ruta_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option value="">Seleccionar ruta</option>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Cliente *</label>
+              <input type="text" name="cliente" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
+              <input type="text" name="direccion" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Entrega *</label>
+              <input type="date" name="fecha_entrega" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
+              <select name="estado" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccionar estado</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="En Curso">En Curso</option>
+                <option value="Completado">Completado</option>
+                <option value="Cancelado">Cancelado</option>
               </select>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Camión</label>
-              <select name="camion_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option value="">Seleccionar camión</option>
-              </select>
+              <input type="text" name="camion" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
             </div>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Clientes a Asignar</label>
-            <div id="clientesContainer" class="max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-3">
-              <!-- Clientes checkboxes will be loaded here -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Conductor</label>
+              <input type="text" name="conductor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+              <textarea name="observaciones" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
             </div>
           </div>
         </form>
@@ -251,7 +144,7 @@ const tableColumns = [
           <button id="cancelBtn" type="button" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
             Cancelar
           </button>
-          <button id="saveBtn" type="submit" form="repartoForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+          <button type="submit" form="repartoForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
             Guardar
           </button>
         </div>
@@ -261,36 +154,42 @@ const tableColumns = [
 
   <script>
     let repartos = [];
-    let filteredRepartos = [];
-    let camiones = [];
-    let rutas = [];
-    let clientes = [];
     let editingReparto = null;
-    let currentPage = 1;
-    let pageSize = 10;
-
-    // Definición de columnas de la tabla
-    const tableColumns = [
-      { key: 'cliente_nombre', label: 'Cliente', sortable: true },
-      { key: 'direccion_entrega', label: 'Dirección', sortable: false },
-      { key: 'fecha_entrega', label: 'Fecha Entrega', sortable: true },
-      { key: 'estado', label: 'Estado', sortable: true },
-      { key: 'ruta_nombre', label: 'Ruta', sortable: true },
-      { key: 'camion_matricula', label: 'Camión', sortable: true },
-      { key: 'actions', label: 'Acciones', sortable: false }
-    ];
 
     document.addEventListener('DOMContentLoaded', async () => {
-      await checkAuth();
-      await loadData();
-      setupEventListeners();
+      const startTime = Date.now();
+      const minLoadingTime = 1000; // Tiempo mínimo de loading: 1 segundo
       
-      // Event listener para búsqueda avanzada
-      document.addEventListener('advancedSearchChange', (event) => {
-        const customEvent = event as CustomEvent;
-        const filters = customEvent.detail;
-        handleRepartoSearch(filters);
-      });
+      try {
+        await checkAuth();
+        await loadData();
+        setupEventListeners();
+      } catch (error) {
+        console.error('Initialization error:', error);
+      } finally {
+        // Asegurar tiempo mínimo de loading para mejor UX
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+        
+        setTimeout(() => {
+          const loading = document.getElementById('loading');
+          const mainContent = document.getElementById('mainContent');
+          
+          if (loading) {
+            loading.style.opacity = '0';
+            setTimeout(() => {
+              loading.classList.add('hidden');
+            }, 300);
+          }
+          if (mainContent) {
+            mainContent.classList.remove('hidden');
+            mainContent.style.opacity = '0';
+            setTimeout(() => {
+              mainContent.style.opacity = '1';
+            }, 50);
+          }
+        }, remainingTime);
+      }
     });
 
     async function checkAuth() {
@@ -302,8 +201,6 @@ const tableColumns = [
           window.location.href = '/login';
           return;
         }
-        
-        document.getElementById('userName').textContent = data.user.nombre_completo;
       } catch (error) {
         console.error('Auth check error:', error);
         window.location.href = '/login';
@@ -312,30 +209,16 @@ const tableColumns = [
 
     async function loadData() {
       try {
-        const [repartosResponse, camionesResponse, rutasResponse, clientesResponse] = await Promise.all([
-          fetch('/api/repartos'),
-          fetch('/api/camiones'),
-          fetch('/api/rutas'),
-          fetch('/api/clientes')
-        ]);
+        const response = await fetch('/api/repartos');
+        const result = await response.json();
         
-        const repartosData = await repartosResponse.json();
-        const camionesData = await camionesResponse.json();
-        const rutasData = await rutasResponse.json();
-        const clientesData = await clientesResponse.json();
-        
-        if (repartosData.success) repartos = repartosData.data;
-        if (camionesData.success) camiones = camionesData.data;
-        if (rutasData.success) rutas = rutasData.data;
-        if (clientesData.success) clientes = clientesData.data.filter(c => c.estado === 'Activo');
-        
-        filteredRepartos = [...repartos];
-        updateStats();
-        updateTable();
-        loadSelectOptions();
-        
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
+        if (result.success) {
+          repartos = result.data || [];
+          updateStats();
+          renderRepartosTable();
+        } else {
+          console.error('Error loading data:', result.message);
+        }
         
       } catch (error) {
         console.error('Error loading data:', error);
@@ -344,411 +227,193 @@ const tableColumns = [
 
     function updateStats() {
       const total = repartos.length;
-      const programados = repartos.filter(r => r.estado === 'programado').length;
-      const enCurso = repartos.filter(r => r.estado === 'en_curso').length;
-      const completados = repartos.filter(r => r.estado === 'completado').length;
+      const pendientes = repartos.filter(r => r.estado === 'Pendiente').length;
+      const enCurso = repartos.filter(r => r.estado === 'En Curso').length;
+      const completados = repartos.filter(r => r.estado === 'Completado').length;
       
       document.getElementById('totalRepartos').textContent = total.toString();
-      document.getElementById('programadosRepartos').textContent = programados.toString();
+      document.getElementById('pendientesRepartos').textContent = pendientes.toString();
       document.getElementById('enCursoRepartos').textContent = enCurso.toString();
       document.getElementById('completadosRepartos').textContent = completados.toString();
     }
 
-    // Función para manejar la búsqueda
-    function handleRepartoSearch(filters) {
-      filteredRepartos = repartos.filter(reparto => {
-        // Filtro por cliente
-        if (filters.cliente_nombre && !reparto.cliente_nombre?.toLowerCase().includes(filters.cliente_nombre.toLowerCase())) {
-          return false;
-        }
-        
-        // Filtro por dirección
-        if (filters.direccion_entrega && !reparto.direccion_entrega?.toLowerCase().includes(filters.direccion_entrega.toLowerCase())) {
-          return false;
-        }
-        
-        // Filtro por estado
-        if (filters.estado && reparto.estado !== filters.estado) {
-          return false;
-        }
-        
-        // Filtro por fecha
-        if (filters.fecha_entrega) {
-          const fechaReparto = new Date(reparto.fecha_entrega).toISOString().split('T')[0];
-          if (fechaReparto !== filters.fecha_entrega) {
-            return false;
-          }
-        }
-        
-        // Filtro por ruta
-        if (filters.ruta && reparto.ruta_nombre?.toLowerCase() !== filters.ruta.toLowerCase()) {
-          return false;
-        }
-        
-        return true;
-      });
-      
-      updateTable();
-    }
+    function renderRepartosTable() {
+      const container = document.getElementById('repartoTableContainer');
+      if (!container) return;
 
-    function sortRepartos(column, direction) {
-      const sortOrder = direction === 'asc' ? 1 : -1;
-      
-      filteredRepartos.sort((a, b) => {
-        let valueA = a[column];
-        let valueB = b[column];
-        
-        // Manejo especial para fechas
-        if (column === 'fecha_entrega') {
-          valueA = new Date(valueA);
-          valueB = new Date(valueB);
-        }
-        
-        // Manejo especial para strings
-        if (typeof valueA === 'string') {
-          valueA = valueA.toLowerCase();
-          valueB = valueB.toLowerCase();
-        }
-        
-        if (valueA < valueB) return -1 * sortOrder;
-        if (valueA > valueB) return 1 * sortOrder;
-        return 0;
-      });
-      
-      updateTable();
-    }
-
-    function updateTable() {
-      // Preparar datos para la tabla
-      const tableData = filteredRepartos.map(reparto => ({
-        id: reparto.id,
-        cliente_nombre: reparto.cliente_nombre || 'Sin asignar',
-        direccion_entrega: reparto.direccion_entrega || '-',
-        fecha_entrega: reparto.fecha_entrega ? new Date(reparto.fecha_entrega).toLocaleDateString() : '-',
-        estado: reparto.estado || 'programado',
-        ruta_nombre: reparto.ruta_nombre || 'Sin ruta',
-        camion_matricula: reparto.camion_matricula || 'Sin asignar'
-      }));
-
-      // Update table content directly
-      updateRepartoTableContent(tableData, filteredRepartos.length);
-    }
-
-    function updateRepartoTableContent(data, total) {
-      const tableContainer = document.querySelector('#repartoTableContainer');
-      if (!tableContainer) return;
+      if (repartos.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            <p class="text-lg font-medium text-gray-900">No hay repartos</p>
+            <p class="text-gray-500">Comienza agregando tu primer reparto</p>
+          </div>
+        `;
+        return;
+      }
 
       const tableHTML = `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <span class="text-sm font-medium text-gray-700">
-              ${data.length > 0 ? `${((currentPage - 1) * pageSize) + 1}-${Math.min(currentPage * pageSize, total)} de ${total}` : '0 registros'}
-            </span>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Camión</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              ${repartos.map(reparto => `
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Entrega</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruta</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Camión</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    ${reparto.cliente || '-'}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500">
+                    ${reparto.direccion || '-'}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                    ${reparto.fecha_entrega ? new Date(reparto.fecha_entrega).toLocaleDateString() : '-'}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      reparto.estado === 'Completado' ? 'bg-green-100 text-green-800' : 
+                      reparto.estado === 'En Curso' ? 'bg-orange-100 text-orange-800' :
+                      reparto.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }">
+                      ${reparto.estado || 'Pendiente'}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${reparto.camion || '-'}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <button onclick="editReparto(${reparto.id})" class="text-blue-600 hover:text-blue-900 mr-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button onclick="deleteReparto(${reparto.id})" class="text-red-600 hover:text-red-900">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                ${data.length === 0 ? `
-                  <tr>
-                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                      <div class="flex flex-col items-center space-y-3">
-                        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <p class="text-lg font-medium">No hay repartos</p>
-                        <p class="text-sm">Comienza agregando tu primer reparto</p>
-                      </div>
-                    </td>
-                  </tr>
-                ` : data.map(reparto => `
-                  <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${reparto.cliente_nombre}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${reparto.direccion_entrega}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${reparto.fecha_entrega}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        reparto.estado === 'Entregado' ? 'bg-green-100 text-green-800' : 
-                        reparto.estado === 'En ruta' ? 'bg-blue-100 text-blue-800' :
-                        reparto.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }">
-                        ${reparto.estado}
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${reparto.ruta_nombre}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${reparto.camion_matricula}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <div class="flex items-center justify-center space-x-2">
-                        <button onclick="editReparto(${reparto.id})" 
-                                class="text-blue-600 hover:text-blue-900 transition-colors">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                          </svg>
-                        </button>
-                        <button onclick="deleteReparto(${reparto.id})" 
-                                class="text-red-600 hover:text-red-900 transition-colors">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
+              `).join('')}
+            </tbody>
+          </table>
         </div>
       `;
 
-      tableContainer.innerHTML = tableHTML;
-      setupRepartoTableEventListeners();
-    }
-
-    function setupRepartoTableEventListeners() {
-      // Setup pagination controls
-      const paginationContainer = document.querySelector('#paginationContainer');
-      if (paginationContainer) {
-        paginationContainer.innerHTML = `
-          <div class="flex items-center justify-between px-6 py-3 border-t border-gray-200 bg-gray-50">
-            <div class="flex items-center space-x-2">
-              <span class="text-sm text-gray-700">Mostrar</span>
-              <select id="pageSizeSelect" class="border border-gray-300 rounded-md px-2 py-1 text-sm">
-                <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
-                <option value="25" ${pageSize === 25 ? 'selected' : ''}>25</option>
-                <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
-              </select>
-              <span class="text-sm text-gray-700">por página</span>
-            </div>
-            <div class="flex items-center space-x-1">
-              <button id="prevPage" ${currentPage === 1 ? 'disabled' : ''} 
-                      class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
-                Anterior
-              </button>
-              <span class="px-3 py-1 text-sm text-gray-700">
-                Página ${currentPage} de ${Math.ceil(filteredRepartos.length / pageSize)}
-              </span>
-              <button id="nextPage" ${currentPage >= Math.ceil(filteredRepartos.length / pageSize) ? 'disabled' : ''} 
-                      class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
-                Siguiente
-              </button>
-            </div>
-          </div>
-        `;
-
-        // Event listeners for pagination
-        document.getElementById('pageSizeSelect')?.addEventListener('change', (e) => {
-          pageSize = parseInt((e.target as HTMLSelectElement).value);
-          currentPage = 1;
-          updateTable();
-        });
-
-        document.getElementById('prevPage')?.addEventListener('click', () => {
-          if (currentPage > 1) {
-            currentPage--;
-            updateTable();
-          }
-        });
-
-        document.getElementById('nextPage')?.addEventListener('click', () => {
-          if (currentPage < Math.ceil(filteredRepartos.length / pageSize)) {
-            currentPage++;
-            updateTable();
-          }
-        });
-      }
-    }
-
-    function loadSelectOptions() {
-      // Cargar rutas
-      const rutaSelect = document.querySelector('[name="ruta_id"]') as HTMLSelectElement;
-      if (rutaSelect) {
-        rutaSelect.innerHTML = '<option value="">Seleccionar ruta</option>';
-        rutas.forEach(ruta => {
-          rutaSelect.innerHTML += `<option value="${ruta.id}">${ruta.nombre} - ${ruta.zona}</option>`;
-        });
-      }
-
-      // Cargar camiones
-      const camionSelect = document.querySelector('[name="camion_id"]') as HTMLSelectElement;
-      if (camionSelect) {
-        camionSelect.innerHTML = '<option value="">Seleccionar camión</option>';
-        camiones.filter(c => c.estado === 'Disponible').forEach(camion => {
-          camionSelect.innerHTML += `<option value="${camion.id}">${camion.matricula} - ${camion.conductor_nombre}</option>`;
-        });
-      }
-
-      // Cargar clientes
-      const clientesContainer = document.getElementById('clientesContainer');
-      if (clientesContainer) {
-        clientesContainer.innerHTML = '';
-        clientes.forEach(cliente => {
-          clientesContainer.innerHTML += `
-            <label class="flex items-center space-x-2 py-1">
-              <input type="checkbox" name="cliente_ids" value="${cliente.id}" class="rounded">
-              <span class="text-sm">${cliente.nombre_completo} - ${cliente.direccion}</span>
-            </label>
-          `;
-        });
-      }
+      container.innerHTML = tableHTML;
     }
 
     function setupEventListeners() {
-      // Botón agregar reparto
-      document.getElementById('addRepartoBtn').addEventListener('click', () => {
-        openModal();
+      // Botón nuevo reparto
+      document.getElementById('newRepartoBtn')?.addEventListener('click', () => {
+        editingReparto = null;
+        document.getElementById('modalTitle').textContent = 'Nuevo Reparto';
+        const form = document.getElementById('repartoForm') as HTMLFormElement;
+        if (form) form.reset();
+        document.getElementById('repartoModal')?.classList.remove('hidden');
       });
 
-      // Botón cancelar modal
-      document.getElementById('cancelBtn').addEventListener('click', () => {
-        closeModal();
+      // Cerrar modal
+      document.getElementById('cancelBtn')?.addEventListener('click', () => {
+        document.getElementById('repartoModal')?.classList.add('hidden');
       });
 
-      // Form submit
-      document.getElementById('repartoForm').addEventListener('submit', async (e) => {
+      // Submit formulario
+      document.getElementById('repartoForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        await saveReparto(e);
-      });
-
-      // Click fuera del modal para cerrar
-      document.getElementById('repartoModal').addEventListener('click', (e) => {
-        if ((e.target as HTMLElement).id === 'repartoModal') {
-          closeModal();
-        }
-      });
-    }
-
-    function openModal(reparto = null) {
-      editingReparto = reparto;
-      const modal = document.getElementById('repartoModal');
-      const form = document.getElementById('repartoForm') as HTMLFormElement;
-      const title = document.getElementById('modalTitle');
-      
-      if (reparto) {
-        title.textContent = 'Editar Reparto';
-        // Llenar formulario con datos del reparto
-        const rutaSelect = form.querySelector('[name="ruta_id"]') as HTMLSelectElement;
-        const camionSelect = form.querySelector('[name="camion_id"]') as HTMLSelectElement;
         
-        if (rutaSelect) rutaSelect.value = reparto.ruta_id?.toString() || '';
-        if (camionSelect) camionSelect.value = reparto.camion_id?.toString() || '';
-        
-        // Marcar clientes asignados
-        const checkboxes = form.querySelectorAll('[name="cliente_ids"]') as NodeListOf<HTMLInputElement>;
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = reparto.clientes && reparto.clientes.some(c => c.cliente_id == parseInt(checkbox.value));
-        });
-      } else {
-        title.textContent = 'Nuevo Reparto';
-        form.reset();
-      }
-      
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeModal() {
-      const modal = document.getElementById('repartoModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      editingReparto = null;
-    }
-
-    async function saveReparto(e) {
-      try {
         const formData = new FormData(e.target as HTMLFormElement);
         const repartoData = Object.fromEntries(formData);
-        
-        // Obtener cliente IDs seleccionados
-        const checkboxes = (e.target as HTMLFormElement).querySelectorAll('[name="cliente_ids"]:checked') as NodeListOf<HTMLInputElement>;
-        const clienteIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
-        
-        const finalData = {
-          ...repartoData,
-          cliente_ids: clienteIds
-        };
-        
-        const url = editingReparto ? `/api/repartos/${editingReparto.id}` : '/api/repartos';
-        const method = editingReparto ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
-          method,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(finalData)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          await loadData();
-          closeModal();
-          showToast(editingReparto ? 'Reparto actualizado exitosamente' : 'Reparto creado exitosamente', 'success');
-        } else {
-          showToast(result.message || 'Error al guardar reparto', 'error');
+
+        try {
+          const url = editingReparto ? `/api/repartos/${editingReparto.id}` : '/api/repartos';
+          const method = editingReparto ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(repartoData)
+          });
+
+          if (response.ok) {
+            document.getElementById('repartoModal')?.classList.add('hidden');
+            await loadData();
+          } else {
+            alert('Error al guardar el reparto');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al guardar el reparto');
         }
-      } catch (error) {
-        console.error('Error saving reparto:', error);
-        showToast('Error al guardar reparto', 'error');
-      }
-    }
-
-    function editReparto(repartoId) {
-      const reparto = repartos.find(r => r.id === repartoId);
-      if (reparto) {
-        openModal(reparto);
-      }
-    }
-
-    function viewReparto(repartoId) {
-      const reparto = repartos.find(r => r.id === repartoId);
-      if (reparto) {
-        // Abrir modal de vista o navegar a página de detalle
-        console.log('Ver reparto:', reparto);
-      }
-    }
-
-    async function deleteReparto(repartoId) {
-      if (!confirm('¿Estás seguro de que quieres eliminar este reparto?')) {
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/api/repartos/${repartoId}`, {
-          method: 'DELETE'
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          await loadData();
-          showToast('Reparto eliminado exitosamente', 'success');
-        } else {
-          showToast(result.message || 'Error al eliminar reparto', 'error');
-        }
-      } catch (error) {
-        console.error('Error deleting reparto:', error);
-        showToast('Error al eliminar reparto', 'error');
-      }
-    }
-
-    function showToast(message, type = 'info') {
-      const toastEvent = new CustomEvent('showToast', {
-        detail: { message, type }
       });
-      document.dispatchEvent(toastEvent);
     }
+
+    // Global functions
+    window.editReparto = function(repartoId) {
+      const reparto = repartos.find(r => r.id === repartoId);
+      if (reparto) {
+        editingReparto = reparto;
+        document.getElementById('modalTitle').textContent = 'Editar Reparto';
+        
+        // Fill form
+        const form = document.getElementById('repartoForm');
+        if (form) {
+          const inputs = form.querySelectorAll('input, select, textarea');
+          inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name && reparto[name] !== undefined) {
+              if (name === 'fecha_entrega' && reparto[name]) {
+                input.value = new Date(reparto[name]).toISOString().split('T')[0];
+              } else {
+                input.value = reparto[name] || '';
+              }
+            }
+          });
+        }
+        
+        document.getElementById('repartoModal')?.classList.remove('hidden');
+      }
+    };
+
+    window.deleteReparto = async function(repartoId) {
+      if (confirm('¿Estás seguro de que quieres eliminar este reparto?')) {
+        try {
+          const response = await fetch(`/api/repartos/${repartoId}`, {
+            method: 'DELETE'
+          });
+
+          if (response.ok) {
+            await loadData();
+          } else {
+            alert('Error al eliminar el reparto');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al eliminar el reparto');
+        }
+      }
+    };
   </script>
+
+  <style>
+    /* Transiciones suaves para el loading */
+    #mainContent {
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    #loading {
+      transition: opacity 0.3s ease-in-out;
+    }
+  </style>
 </Layout>
