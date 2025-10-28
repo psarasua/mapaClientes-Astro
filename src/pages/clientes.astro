@@ -5,6 +5,8 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
 import SmartForm from '../components/forms/SmartForm.astro';
 import SmartInput from '../components/forms/SmartInput.astro';
 import SmartSelect from '../components/forms/SmartSelect.astro';
+import InteractiveButton from '../components/interactions/InteractiveButton.astro';
+import InteractiveCard from '../components/interactions/InteractiveCard.astro';
 ---
 
 <Layout title="Clientes - Sistema de Gestión">
@@ -18,17 +20,26 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
       <p class="text-gray-600">Administra tu base de clientes</p>
     </div>
 
-        <!-- Tabla de Clientes -->
-        <div class="bg-white rounded-lg shadow">
+        <!-- Gestión de Clientes Card -->
+        <InteractiveCard 
+          class="mb-8" 
+          hover="lift"
+          data-stagger="0.1"
+        >
           <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-medium text-gray-900">Clientes</h2>
-              <button id="newClientBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+              <InteractiveButton 
+                variant="primary"
+                size="md"
+                class="interactive-button"
+                data-button-id="newClientBtn"
+              >
                 <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 Nuevo Cliente
-              </button>
+              </InteractiveButton>
             </div>
           </div>
           <div id="clientTableContainer" class="p-6">
@@ -36,7 +47,7 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
               <p class="text-gray-500">Cargando clientes...</p>
             </div>
           </div>
-        </div>
+        </InteractiveCard>
     </main>
 
     <!-- Smart Form para clientes -->
@@ -216,7 +227,7 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               ${clients.map(client => `
-                <tr>
+                <tr class="interactive-row hover:bg-gray-50 transition-colors duration-200">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     ${client.nombre || client.razonsocial || 'Sin nombre'}
                   </td>
@@ -227,23 +238,25 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
                     ${client.telefono || '-'}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-all duration-200 ${
                       client.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }">
                       ${client.estado || 'Activo'}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <button onclick="editClient(${client.id})" class="text-blue-600 hover:text-blue-900 mr-2">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                      </svg>
-                    </button>
-                    <button onclick="deleteClient(${client.id})" class="text-red-600 hover:text-red-900">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                    </button>
+                    <div class="flex justify-center space-x-2">
+                      <button onclick="editClient(${client.id})" class="interactive-button text-blue-600 hover:text-blue-900 p-2 rounded transition-all duration-200 hover:bg-blue-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                      </button>
+                      <button onclick="deleteClient(${client.id})" class="interactive-button text-red-600 hover:text-red-900 p-2 rounded transition-all duration-200 hover:bg-red-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               `).join('')}
@@ -256,8 +269,9 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
     }
 
     function setupEventListeners() {
-      // Botón nuevo cliente
-      document.getElementById('newClientBtn')?.addEventListener('click', () => {
+      // Botón nuevo cliente - Buscar por data-button-id
+      const newClientBtn = document.querySelector('[data-button-id="newClientBtn"]');
+      newClientBtn?.addEventListener('click', () => {
         editingClient = null;
         const titleEl = document.getElementById('clientForm-title');
         if (titleEl) titleEl.textContent = 'Nuevo Cliente';

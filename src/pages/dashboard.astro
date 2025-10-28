@@ -4,6 +4,8 @@ import MotionSimple from '../components/MotionSimple.astro';
 import KPIWidget from '../components/widgets/KPIWidget.astro';
 import ChartWidget from '../components/widgets/ChartWidget.astro';
 import NotificationBell from '../components/widgets/NotificationBell.astro';
+import InteractiveButton from '../components/interactions/InteractiveButton.astro';
+import InteractiveCard from '../components/interactions/InteractiveCard.astro';
 ---
 
 <Layout title="Dashboard - Sistema de Repartos">
@@ -46,15 +48,17 @@ import NotificationBell from '../components/widgets/NotificationBell.astro';
                 </div>
                 <span id="userName" class="text-gray-700 font-medium text-sm"></span>
               </div>
-              <button 
-                id="logoutBtn"
-                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm flex items-center space-x-2"
+              <InteractiveButton 
+                variant="secondary"
+                size="sm"
+                class="interactive-button"
+                data-button-id="logoutBtn"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                 </svg>
                 <span>Salir</span>
-              </button>
+              </InteractiveButton>
             </div>
           </div>
         </div>
@@ -112,90 +116,103 @@ import NotificationBell from '../components/widgets/NotificationBell.astro';
       <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         <!-- KPI Widgets modernos con animaciones -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-motion="fade-up" data-delay="200">
-          <KPIWidget 
-            title="Total Clientes"
-            value={45}
-            targetValue={50}
-            icon="users"
-            trend="up"
-            trendValue={8.2}
-            color="blue"
-            subtitle="Clientes activos"
-          />
-          <KPIWidget 
-            title="Camiones Activos"
-            value={12}
-            targetValue={15}
-            icon="truck"
-            trend="up"
-            trendValue={12.5}
-            color="green"
-            subtitle="En operación"
-          />
-          <KPIWidget 
-            title="Repartos Hoy"
-            value={28}
-            targetValue={35}
-            icon="package"
-            trend="down"
-            trendValue={-3.1}
-            color="yellow"
-            subtitle="Programados"
-          />
-          <KPIWidget 
-            title="Eficiencia"
-            value={87}
-            targetValue={100}
-            icon="trending-up"
-            trend="up"
-            trendValue={4.7}
-            color="purple"
-            subtitle="Promedio semanal"
-            showProgress={true}
-          />
+          <InteractiveCard hover="lift" data-stagger="0.1">
+            <KPIWidget 
+              title="Total Clientes"
+              value={45}
+              targetValue={50}
+              icon="users"
+              trend="up"
+              trendValue={8.2}
+              color="blue"
+              subtitle="Clientes activos"
+            />
+          </InteractiveCard>
+          <InteractiveCard hover="lift" data-stagger="0.2">
+            <KPIWidget 
+              title="Camiones Activos"
+              value={12}
+              targetValue={15}
+              icon="truck"
+              trend="up"
+              trendValue={12.5}
+              color="green"
+              subtitle="En operación"
+            />
+          </InteractiveCard>
+          <InteractiveCard hover="lift" data-stagger="0.3">
+            <KPIWidget 
+              title="Repartos Hoy"
+              value={28}
+              targetValue={35}
+              icon="package"
+              trend="down"
+              trendValue={-3.1}
+              color="yellow"
+              subtitle="Programados"
+            />
+          </InteractiveCard>
+          <InteractiveCard hover="lift" data-stagger="0.4">
+            <KPIWidget 
+              title="Eficiencia"
+              value={87}
+              targetValue={100}
+              icon="trending-up"
+              trend="up"
+              trendValue={4.7}
+              color="purple"
+              subtitle="Promedio semanal"
+              showProgress={true}
+            />
+          </InteractiveCard>
         </div>
 
         <!-- Charts modernos con widgets -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" data-motion="fade-up" data-delay="400">
-          <ChartWidget 
-            title="Repartos por Semana"
-            type="line"
-            color="blue"
-            data={{
-              labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-              datasets: [{
-                label: 'Repartos',
-                data: [12, 15, 8, 22, 18, 14, 9]
-              }]
-            }}
-          />
-          <ChartWidget 
-            title="Estado de Repartos"
-            type="doughnut"
-            color="green"
-            height={300}
-            data={{
-              labels: ['Completado', 'En Ruta', 'Pendiente', 'Cancelado'],
-              datasets: [{
-                data: [65, 20, 10, 5]
-              }]
-            }}
-          />
+          <InteractiveCard hover="lift" data-stagger="0.5">
+            <ChartWidget 
+              title="Repartos por Semana"
+              type="line"
+              color="blue"
+              data={{
+                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                datasets: [{
+                  label: 'Repartos',
+                  data: [12, 15, 8, 22, 18, 14, 9]
+                }]
+              }}
+            />
+          </InteractiveCard>
+          <InteractiveCard hover="lift" data-stagger="0.6">
+            <ChartWidget 
+              title="Estado de Repartos"
+              type="doughnut"
+              color="green"
+              height={300}
+              data={{
+                labels: ['Completado', 'En Ruta', 'Pendiente', 'Cancelado'],
+                datasets: [{
+                  data: [65, 20, 10, 5]
+                }]
+              }}
+            />
+          </InteractiveCard>
         </div>
 
         <!-- Charts adicionales -->
         <div class="grid grid-cols-1 gap-8 mb-8" data-motion="fade-up" data-delay="600">
-          <ChartWidget 
-            title="Rendimiento Mensual de Camiones"
-            type="bar"
-            color="purple"
-            height={400}
-            data={{
-              labels: ['CAM-001', 'CAM-002', 'CAM-003', 'CAM-004', 'CAM-005'],
-              datasets: [
-                {
-                  label: 'Repartos Completados',
-                  data: [45, 38, 52, 41, 47]
+          <InteractiveCard hover="lift" data-stagger="0.7">
+            <ChartWidget 
+              title="Rendimiento Mensual de Camiones"
+              type="bar"
+              color="purple"
+              height={400}
+              data={{
+                labels: ['CAM-001', 'CAM-002', 'CAM-003', 'CAM-004', 'CAM-005'],
+                datasets: [
+                  {
+                    label: 'Repartos Completados',
+                    data: [45, 38, 52, 41, 47]
                 },
                 {
                   label: 'Km Recorridos',
@@ -204,13 +221,14 @@ import NotificationBell from '../components/widgets/NotificationBell.astro';
               ]
             }}
           />
+          </InteractiveCard>
         </div>
 
         <!-- Acciones rápidas con animaciones -->
         <div class="mt-8" data-motion="fade-up" data-delay="600">
           <h2 class="text-2xl font-bold text-gray-900 mb-6" style="font-family: Inter;">Acciones Rápidas</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 motion-stagger-children">
-            <a href="/clientes" class="card group motion-hover-lift motion-hover-scale-95" data-motion="fade-up" data-delay="0">
+            <InteractiveCard hover="lift" clickable={true} onclick="location.href='/clientes'" data-stagger="0.8" class="cursor-pointer">
               <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors motion-hover-scale">
                   <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,9 +240,9 @@ import NotificationBell from '../components/widgets/NotificationBell.astro';
                   <p class="text-sm text-gray-600">Agregar cliente</p>
                 </div>
               </div>
-            </a>
+            </InteractiveCard>
 
-            <a href="/camiones" class="card group motion-hover-lift motion-hover-scale-95" data-motion="fade-up" data-delay="100">
+            <InteractiveCard hover="lift" clickable={true} onclick="location.href='/camiones'" data-stagger="0.9" class="cursor-pointer">
               <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors motion-hover-scale">
                   <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,9 +254,9 @@ import NotificationBell from '../components/widgets/NotificationBell.astro';
                   <p class="text-sm text-gray-600">Ver camiones</p>
                 </div>
               </div>
-            </a>
+            </InteractiveCard>
 
-            <a href="/repartos" class="card group motion-hover-lift motion-hover-scale-95" data-motion="fade-up" data-delay="200">
+            <InteractiveCard hover="lift" clickable={true} onclick="location.href='/repartos'" data-stagger="1.0" class="cursor-pointer">
               <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center group-hover:bg-orange-200 transition-colors motion-hover-scale">
                   <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,7 +268,21 @@ import NotificationBell from '../components/widgets/NotificationBell.astro';
                   <p class="text-sm text-gray-600">Crear ruta</p>
                 </div>
               </div>
-            </a>
+            </InteractiveCard>
+
+            <InteractiveCard hover="lift" clickable={true} onclick="location.href='/mapa'" data-stagger="1.1" class="cursor-pointer">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors motion-hover-scale">
+                  <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900">Ver Mapa</h3>
+                  <p class="text-sm text-gray-600">Rutas en tiempo real</p>
+                </div>
+              </div>
+            </InteractiveCard>
 
           </div>
         </div>
@@ -288,7 +320,8 @@ import NotificationBell from '../components/widgets/NotificationBell.astro';
     }
 
     // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const logoutBtn = document.querySelector('[data-button-id="logoutBtn"]');
+    logoutBtn?.addEventListener('click', async () => {
       try {
         await fetch('/api/auth/logout', { method: 'POST' });
         window.location.href = '/login';

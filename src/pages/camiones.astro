@@ -5,6 +5,8 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
 import SmartForm from '../components/forms/SmartForm.astro';
 import SmartInput from '../components/forms/SmartInput.astro';
 import SmartSelect from '../components/forms/SmartSelect.astro';
+import InteractiveButton from '../components/interactions/InteractiveButton.astro';
+import InteractiveCard from '../components/interactions/InteractiveCard.astro';
 ---
 
 <Layout title="Camiones - Sistema de Gestión">
@@ -20,7 +22,7 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div class="bg-white rounded-lg shadow p-6">
+          <InteractiveCard hover="lift" class="p-6" data-stagger="0.1">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600 mb-1">Total</p>
@@ -32,9 +34,9 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
                 </svg>
               </div>
             </div>
-          </div>
+          </InteractiveCard>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <InteractiveCard hover="lift" class="p-6" data-stagger="0.2">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600 mb-1">Activos</p>
@@ -46,9 +48,9 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
                 </svg>
               </div>
             </div>
-          </div>
+          </InteractiveCard>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <InteractiveCard hover="lift" class="p-6" data-stagger="0.3">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600 mb-1">Mantenimiento</p>
@@ -61,9 +63,9 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
                 </svg>
               </div>
             </div>
-          </div>
+          </InteractiveCard>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <InteractiveCard hover="lift" class="p-6" data-stagger="0.4">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600 mb-1">Disponibles</p>
@@ -75,20 +77,25 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
                 </svg>
               </div>
             </div>
-          </div>
+          </InteractiveCard>
         </div>
 
         <!-- Tabla de Camiones -->
-        <div class="bg-white rounded-lg shadow">
+        <InteractiveCard class="mb-8" hover="lift" data-stagger="0.5">
           <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-medium text-gray-900">Camiones</h2>
-              <button id="newCamionBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+              <InteractiveButton 
+                variant="primary"
+                size="md"
+                class="interactive-button"
+                data-button-id="newCamionBtn"
+              >
                 <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 Nuevo Camión
-              </button>
+              </InteractiveButton>
             </div>
           </div>
           <div id="camionTableContainer" class="p-6">
@@ -96,7 +103,7 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
               <p class="text-gray-500">Cargando camiones...</p>
             </div>
           </div>
-        </div>
+        </InteractiveCard>
     </main>
 
     <!-- Smart Form Modal for Camions -->
@@ -345,8 +352,9 @@ import SmartSelect from '../components/forms/SmartSelect.astro';
     }
 
     function setupEventListeners() {
-      // Botón nuevo camión
-      document.getElementById('newCamionBtn')?.addEventListener('click', () => {
+      // Botón nuevo camión - Buscar por data-button-id
+      const newCamionBtn = document.querySelector('[data-button-id="newCamionBtn"]');
+      newCamionBtn?.addEventListener('click', () => {
         editingCamion = null;
         const titleEl = document.getElementById('camionForm-title');
         if (titleEl) titleEl.textContent = 'Nuevo Camión';

@@ -1,0 +1,235 @@
+---
+// src/components/interactions/InteractiveCard.astro
+export interface Props {
+  hover?: 'lift' | 'scale' | 'tilt' | 'glow' | 'none';
+  clickable?: boolean;
+  loading?: boolean;
+  selected?: boolean;
+  class?: string;
+  onclick?: string;
+  padding?: 'none' | 'sm' | 'md' | 'lg';
+}
+
+const { 
+  hover = 'lift',
+  clickable = false,
+  loading = false,
+  selected = false,
+  class: className = '',
+  onclick = '',
+  padding = 'md'
+} = Astro.props;
+
+const baseClasses = 'bg-white rounded-lg shadow-sm border transition-all duration-300 ease-out relative overflow-hidden';
+
+const hoverClasses = {
+  lift: 'hover:-translate-y-2 hover:shadow-xl',
+  scale: 'hover:scale-105 hover:shadow-lg',
+  tilt: 'hover:rotate-1 hover:scale-105 hover:shadow-lg',
+  glow: 'hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-200',
+  none: ''
+};
+
+const paddingClasses = {
+  none: '',
+  sm: 'p-4',
+  md: 'p-6',
+  lg: 'p-8'
+};
+
+const interactiveClasses = clickable ? 'cursor-pointer' : '';
+const selectedClasses = selected ? 'ring-2 ring-blue-500 border-blue-300 shadow-lg' : '';
+const loadingClasses = loading ? 'animate-pulse' : '';
+
+const finalClasses = `
+  ${baseClasses}
+  ${hoverClasses[hover]}
+  ${paddingClasses[padding]}
+  ${interactiveClasses}
+  ${selectedClasses}
+  ${loadingClasses}
+  ${className}
+`.trim().replace(/\s+/g, ' ');
+---
+
+<div 
+  class={finalClasses}
+  onclick={onclick}
+  data-card-interactive={clickable}
+  data-card-loading={loading}
+>
+  <!-- Loading overlay -->
+  {loading && (
+    <div class="absolute inset-0 bg-gray-50 bg-opacity-75 flex items-center justify-center rounded-lg z-10">
+      <div class="flex items-center space-x-3">
+        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+        <span class="text-sm text-gray-600 font-medium">Cargando...</span>
+      </div>
+    </div>
+  )}
+  
+  <!-- Success indicator -->
+  <div class="success-indicator absolute top-4 right-4 transform scale-0 transition-transform duration-300">
+    <div class="bg-green-500 text-white rounded-full p-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+    </div>
+  </div>
+  
+  <!-- Card content -->
+  <div class="relative z-0">
+    <slot />
+  </div>
+  
+  <!-- Shimmer effect for loading -->
+  {loading && (
+    <div class="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+  )}
+</div>
+
+<style>
+  /* Card entrance animation */
+  [data-card-interactive] {
+    animation: cardFadeIn 0.5s ease-out;
+  }
+  
+  @keyframes cardFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Enhanced focus states */
+  [data-card-interactive="true"]:focus-within {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    outline: 2px solid rgba(59, 130, 246, 0.5);
+    outline-offset: 2px;
+  }
+  
+  /* Active state with subtle scale */
+  [data-card-interactive="true"]:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
+  }
+  
+  /* Selected state glow */
+  [data-card-interactive="true"].selected {
+    box-shadow: 0 0 0 1px rgb(59 130 246), 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  
+  /* Shimmer animation for loading */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+  
+  /* Success animation */
+  .success-indicator.show {
+    transform: scale(1);
+  }
+  
+  /* Stagger animation for multiple cards */
+  .stagger-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: staggerFadeIn 0.6s ease-out forwards;
+  }
+  
+  .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-item:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-item:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-item:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-item:nth-child(5) { animation-delay: 0.5s; }
+  .stagger-item:nth-child(6) { animation-delay: 0.6s; }
+  
+  @keyframes staggerFadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<script>
+  // Card interaction enhancements
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('[data-card-interactive="true"]');
+    
+    cards.forEach(card => {
+      // Add keyboard navigation
+      card.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.click();
+        }
+      });
+      
+      // Add focus management
+      if (!card.hasAttribute('tabindex')) {
+        card.setAttribute('tabindex', '0');
+      }
+      
+      // Enhanced ripple effect on click
+      card.addEventListener('click', function(e) {
+        const ripple = document.createElement('div');
+        ripple.className = 'absolute rounded-full bg-blue-400 opacity-30 animate-ping';
+        ripple.style.width = ripple.style.height = '20px';
+        ripple.style.left = (e.offsetX - 10) + 'px';
+        ripple.style.top = (e.offsetY - 10) + 'px';
+        ripple.style.pointerEvents = 'none';
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 1000);
+      });
+    });
+    
+    // Intersection Observer for stagger animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, observerOptions);
+    
+    // Observe stagger items
+    document.querySelectorAll('.stagger-item').forEach(item => {
+      item.style.animationPlayState = 'paused';
+      observer.observe(item);
+    });
+  });
+  
+  // Global function to show success indicator
+  window.showCardSuccess = function(cardElement) {
+    const indicator = cardElement.querySelector('.success-indicator');
+    if (indicator) {
+      indicator.classList.add('show');
+      setTimeout(() => {
+        indicator.classList.remove('show');
+      }, 2000);
+    }
+  };
+</script>

@@ -1,0 +1,203 @@
+---
+// src/components/interactions/InteractiveButton.astro
+export interface Props {
+  variant?: 'primary' | 'secondary' | 'danger' | 'success';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  disabled?: boolean;
+  ripple?: boolean;
+  hoverEffect?: 'scale' | 'lift' | 'glow' | 'none';
+  class?: string;
+  onclick?: string;
+  type?: 'button' | 'submit' | 'reset';
+}
+
+const { 
+  variant = 'primary', 
+  size = 'md', 
+  loading = false, 
+  disabled = false,
+  ripple = true,
+  hoverEffect = 'scale',
+  class: className = '',
+  onclick = '',
+  type = 'button'
+} = Astro.props;
+
+const baseClasses = 'relative overflow-hidden font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 select-none';
+
+const variantClasses = {
+  primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-sm hover:shadow-md',
+  secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 focus:ring-gray-500 shadow-sm hover:shadow-md',
+  danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 shadow-sm hover:shadow-md',
+  success: 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500 shadow-sm hover:shadow-md'
+};
+
+const sizeClasses = {
+  sm: 'px-3 py-1.5 text-sm',
+  md: 'px-4 py-2 text-sm',
+  lg: 'px-6 py-3 text-base'
+};
+
+const hoverEffectClasses = {
+  scale: 'hover:scale-105 active:scale-95',
+  lift: 'hover:-translate-y-1 hover:shadow-lg active:translate-y-0',
+  glow: 'hover:shadow-2xl hover:shadow-blue-500/25',
+  none: ''
+};
+
+const finalClasses = `
+  ${baseClasses}
+  ${variantClasses[variant]}
+  ${sizeClasses[size]}
+  ${hoverEffectClasses[hoverEffect]}
+  ${disabled || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+  ${className}
+`.trim().replace(/\s+/g, ' ');
+---
+
+<button 
+  class={finalClasses}
+  disabled={disabled || loading}
+  onclick={onclick}
+  data-ripple={ripple}
+  data-interactive-button="true"
+  type={type}
+>
+  <!-- Loading spinner -->
+  {loading && (
+    <span class="absolute inset-0 flex items-center justify-center">
+      <svg class="animate-spin h-4 w-4 text-current" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </span>
+  )}
+  
+  <!-- Button content -->
+  <span class={`flex items-center justify-center gap-2 transition-opacity duration-200 ${loading ? 'opacity-0' : 'opacity-100'}`}>
+    <slot />
+  </span>
+  
+  <!-- Ripple effect container -->
+  {ripple && (
+    <span class="absolute inset-0 overflow-hidden rounded-lg pointer-events-none">
+      <span class="ripple-effect"></span>
+    </span>
+  )}
+</button>
+
+<style>
+  /* Ripple effect animation */
+  .ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: none;
+    pointer-events: none;
+  }
+  
+  .ripple-effect.animate {
+    animation: ripple 0.6s linear;
+  }
+  
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+  
+  /* Enhanced focus styles */
+  [data-interactive-button="true"]:focus-visible {
+    transform: translateY(-1px);
+    outline: 2px solid transparent;
+  }
+  
+  /* Pulse animation for loading state */
+  [data-interactive-button="true"][disabled] {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  
+  /* Success animation */
+  [data-interactive-button="true"].success-flash {
+    animation: successFlash 0.5s ease-out;
+  }
+  
+  @keyframes successFlash {
+    0% { background-color: rgb(34 197 94); }
+    50% { background-color: rgb(22 163 74); }
+    100% { background-color: rgb(34 197 94); }
+  }
+</style>
+
+<script>
+  // Enhanced button interactions
+  document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('[data-interactive-button="true"]');
+    
+    buttons.forEach(button => {
+      // Ripple effect
+      if (button.dataset.ripple === 'true') {
+        button.addEventListener('click', function(e) {
+          const ripple = this.querySelector('.ripple-effect');
+          if (!ripple || this.disabled) return;
+          
+          const rect = this.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+          
+          ripple.style.width = ripple.style.height = size + 'px';
+          ripple.style.left = x + 'px';
+          ripple.style.top = y + 'px';
+          
+          ripple.classList.remove('animate');
+          ripple.offsetHeight; // Trigger reflow
+          ripple.classList.add('animate');
+          
+          setTimeout(() => {
+            ripple.classList.remove('animate');
+          }, 600);
+        });
+      }
+      
+      // Enhanced click feedback
+      button.addEventListener('mousedown', function() {
+        if (!this.disabled) {
+          this.style.transform = 'scale(0.98)';
+        }
+      });
+      
+      button.addEventListener('mouseup', function() {
+        if (!this.disabled) {
+          this.style.transform = '';
+        }
+      });
+      
+      button.addEventListener('mouseleave', function() {
+        this.style.transform = '';
+      });
+    });
+  });
+  
+  // Global success animation function
+  window.animateButtonSuccess = function(buttonElement) {
+    if (buttonElement) {
+      buttonElement.classList.add('success-flash');
+      setTimeout(() => {
+        buttonElement.classList.remove('success-flash');
+      }, 500);
+    }
+  };
+</script>
