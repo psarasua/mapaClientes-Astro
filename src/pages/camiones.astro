@@ -2,6 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
 import LoadingSpinner from '../components/LoadingSpinner.astro';
+import SmartForm from '../components/forms/SmartForm.astro';
+import SmartInput from '../components/forms/SmartInput.astro';
+import SmartSelect from '../components/forms/SmartSelect.astro';
 ---
 
 <Layout title="Camiones - Sistema de Gestión">
@@ -96,62 +99,83 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
         </div>
     </main>
 
-    <!-- Add/Edit Camion Modal -->
-    <div id="camionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Nuevo Camión</h3>
-        </div>
-        <form id="camionForm" class="px-6 py-4 space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula *</label>
-              <input type="text" name="matricula" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Marca *</label>
-              <input type="text" name="marca" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Modelo *</label>
-              <input type="text" name="modelo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Capacidad (kg) *</label>
-              <input type="number" name="capacidad_kg" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
-              <select name="estado" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option value="">Seleccionar estado</option>
-                <option value="Activo">Activo</option>
-                <option value="Disponible">Disponible</option>
-                <option value="Mantenimiento">Mantenimiento</option>
-                <option value="Inactivo">Inactivo</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Adquisición</label>
-              <input type="date" name="fecha_adquisicion" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-          </div>
-        </form>
+    <!-- Smart Form Modal for Camions -->
+    <SmartForm 
+      id="camionForm" 
+      title="Nuevo Camión"
+      onSubmit="handleCamionSubmit"
+      onCancel="handleCamionCancel"
+      autoSave={true}
+      autoSaveInterval={30000}
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SmartInput
+          name="matricula"
+          label="Matrícula"
+          type="text"
+          required={true}
+          maxLength={20}
+          icon="truck"
+          placeholder="Ej: ABC-1234"
+        />
         
-        <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
-          <button id="cancelBtn" type="button" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
-            Cancelar
-          </button>
-          <button type="submit" form="camionForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-            Guardar
-          </button>
-        </div>
+        <SmartInput
+          name="marca"
+          label="Marca"
+          type="text"
+          required={true}
+          maxLength={50}
+          icon="tag"
+          placeholder="Ej: Mercedes"
+        />
+        
+        <SmartInput
+          name="modelo"
+          label="Modelo"
+          type="text"
+          required={true}
+          maxLength={50}
+          icon="cog"
+          placeholder="Ej: Actros 1840"
+        />
+        
+        <SmartInput
+          name="capacidad_kg"
+          label="Capacidad (kg)"
+          type="number"
+          required={true}
+          min={100}
+          max={50000}
+          icon="scale"
+          placeholder="Ej: 18000"
+        />
+        
+        <SmartSelect
+          name="estado"
+          label="Estado"
+          required={true}
+          options={[
+            { value: 'Activo', label: 'Activo' },
+            { value: 'Disponible', label: 'Disponible' },
+            { value: 'Mantenimiento', label: 'Mantenimiento' },
+            { value: 'Inactivo', label: 'Inactivo' }
+          ]}
+        />
+        
+        <SmartInput
+          name="fecha_adquisicion"
+          label="Fecha de Adquisición"
+          type="date"
+          icon="calendar"
+        />
       </div>
-    </div>
+    </SmartForm>
   </div>
 
   <script>
     let camiones = [];
     let editingCamion = null;
+    let camionFormManager = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
       const startTime = Date.now();
@@ -161,6 +185,15 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
         await checkAuth();
         await loadData();
         setupEventListeners();
+        
+        // Initialize smart form manager
+        camionFormManager = new SmartFormManager('camionForm', {
+          autoSave: true,
+          autoSaveInterval: 30000,
+          onSubmit: 'handleCamionSubmit',
+          onCancel: 'handleCamionCancel'
+        });
+        
       } catch (error) {
         console.error('Initialization error:', error);
       } finally {
@@ -315,71 +348,55 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
       // Botón nuevo camión
       document.getElementById('newCamionBtn')?.addEventListener('click', () => {
         editingCamion = null;
-        document.getElementById('modalTitle').textContent = 'Nuevo Camión';
-        const form = document.getElementById('camionForm') as HTMLFormElement;
-        if (form) form.reset();
-        document.getElementById('camionModal')?.classList.remove('hidden');
-      });
-
-      // Cerrar modal
-      document.getElementById('cancelBtn')?.addEventListener('click', () => {
-        document.getElementById('camionModal')?.classList.add('hidden');
-      });
-
-      // Submit formulario
-      document.getElementById('camionForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(e.target as HTMLFormElement);
-        const camionData = Object.fromEntries(formData);
-
-        try {
-          const url = editingCamion ? `/api/camiones/${editingCamion.id}` : '/api/camiones';
-          const method = editingCamion ? 'PUT' : 'POST';
-          
-          const response = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(camionData)
-          });
-
-          if (response.ok) {
-            document.getElementById('camionModal')?.classList.add('hidden');
-            await loadData();
-          } else {
-            alert('Error al guardar el camión');
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('Error al guardar el camión');
-        }
+        const titleEl = document.getElementById('camionForm-title');
+        if (titleEl) titleEl.textContent = 'Nuevo Camión';
+        camionFormManager?.open({});
       });
     }
+
+    // Handler functions for SmartForm
+    window.handleCamionSubmit = async function(data) {
+      try {
+        const url = editingCamion ? `/api/camiones/${editingCamion.id}` : '/api/camiones';
+        const method = editingCamion ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          camionFormManager?.close();
+          await loadData();
+          
+          // Mostrar notificación de éxito
+          if (editingCamion) {
+            showSuccess('Camión actualizado', 'Los datos del camión se han actualizado correctamente');
+          } else {
+            showSuccess('Camión creado', 'El nuevo camión se ha agregado exitosamente');
+          }
+        } else {
+          showError('Error', 'No se pudo guardar el camión. Inténtalo de nuevo.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showError('Error de conexión', 'No se pudo conectar con el servidor');
+      }
+    };
+    
+    window.handleCamionCancel = function() {
+      editingCamion = null;
+    };
 
     // Global functions
     window.editCamion = function(camionId) {
       const camion = camiones.find(c => c.id === camionId);
       if (camion) {
         editingCamion = camion;
-        document.getElementById('modalTitle').textContent = 'Editar Camión';
-        
-        // Fill form
-        const form = document.getElementById('camionForm');
-        if (form) {
-          const inputs = form.querySelectorAll('input, select');
-          inputs.forEach(input => {
-            const name = input.getAttribute('name');
-            if (name && camion[name] !== undefined) {
-              if (name === 'fecha_adquisicion' && camion[name]) {
-                input.value = new Date(camion[name]).toISOString().split('T')[0];
-              } else {
-                input.value = camion[name] || '';
-              }
-            }
-          });
-        }
-        
-        document.getElementById('camionModal')?.classList.remove('hidden');
+        const titleEl = document.getElementById('camionForm-title');
+        if (titleEl) titleEl.textContent = 'Editar Camión';
+        camionFormManager?.open(camion);
       }
     };
 
@@ -392,12 +409,13 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
 
           if (response.ok) {
             await loadData();
+            showSuccess('Camión eliminado', 'El camión se ha eliminado correctamente');
           } else {
-            alert('Error al eliminar el camión');
+            showError('Error', 'No se pudo eliminar el camión');
           }
         } catch (error) {
           console.error('Error:', error);
-          alert('Error al eliminar el camión');
+          showError('Error de conexión', 'No se pudo conectar con el servidor');
         }
       }
     };

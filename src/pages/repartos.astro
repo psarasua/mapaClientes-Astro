@@ -2,6 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
 import LoadingSpinner from '../components/LoadingSpinner.astro';
+import SmartForm from '../components/forms/SmartForm.astro';
+import SmartInput from '../components/forms/SmartInput.astro';
+import SmartSelect from '../components/forms/SmartSelect.astro';
 ---
 
 <Layout title="Repartos - Sistema de Gestión">
@@ -95,66 +98,92 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
         </div>
     </main>
 
-    <!-- Add/Edit Reparto Modal -->
-    <div id="repartoModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Nuevo Reparto</h3>
-        </div>
-        <form id="repartoForm" class="px-6 py-4 space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Cliente *</label>
-              <input type="text" name="cliente" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
-              <input type="text" name="direccion" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Entrega *</label>
-              <input type="date" name="fecha_entrega" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
-              <select name="estado" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option value="">Seleccionar estado</option>
-                <option value="Pendiente">Pendiente</option>
-                <option value="En Curso">En Curso</option>
-                <option value="Completado">Completado</option>
-                <option value="Cancelado">Cancelado</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Camión</label>
-              <input type="text" name="camion" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Conductor</label>
-              <input type="text" name="conductor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-              <textarea name="observaciones" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-            </div>
-          </div>
-        </form>
+    <!-- Smart Form Modal for Repartos -->
+    <SmartForm 
+      id="repartoForm" 
+      title="Nuevo Reparto"
+      onSubmit="handleRepartoSubmit"
+      onCancel="handleRepartoCancel"
+      autoSave={true}
+      autoSaveInterval={30000}
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SmartInput
+          name="cliente"
+          label="Cliente"
+          type="text"
+          required={true}
+          maxLength={100}
+          icon="user"
+          placeholder="Nombre del cliente"
+        />
         
-        <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
-          <button id="cancelBtn" type="button" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
-            Cancelar
-          </button>
-          <button type="submit" form="repartoForm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-            Guardar
-          </button>
-        </div>
+        <SmartInput
+          name="direccion"
+          label="Dirección de entrega"
+          type="text"
+          required={true}
+          maxLength={200}
+          icon="location-marker"
+          placeholder="Dirección completa"
+        />
+        
+        <SmartInput
+          name="fecha_entrega"
+          label="Fecha de entrega"
+          type="date"
+          required={true}
+          icon="calendar"
+        />
+        
+        <SmartSelect
+          name="estado"
+          label="Estado"
+          required={true}
+          options={[
+            { value: 'Pendiente', label: 'Pendiente' },
+            { value: 'En Curso', label: 'En Curso' },
+            { value: 'Completado', label: 'Completado' },
+            { value: 'Cancelado', label: 'Cancelado' }
+          ]}
+        />
+        
+        <SmartInput
+          name="camion"
+          label="Camión asignado"
+          type="text"
+          maxLength={50}
+          icon="truck"
+          placeholder="Matrícula del camión"
+        />
+        
+        <SmartInput
+          name="conductor"
+          label="Conductor"
+          type="text"
+          maxLength={100}
+          icon="user-circle"
+          placeholder="Nombre del conductor"
+        />
       </div>
-    </div>
+      
+      <div class="col-span-2">
+        <SmartInput
+          name="observaciones"
+          label="Observaciones"
+          type="textarea"
+          maxLength={500}
+          icon="document-text"
+          placeholder="Observaciones sobre el reparto..."
+        />
+      </div>
+    </SmartForm>
   </div>
 
   <script>
     let repartos = [];
     let editingReparto = null;
+    let repartoFormManager = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
       const startTime = Date.now();
@@ -164,6 +193,15 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
         await checkAuth();
         await loadData();
         setupEventListeners();
+        
+        // Initialize smart form manager
+        repartoFormManager = new SmartFormManager('repartoForm', {
+          autoSave: true,
+          autoSaveInterval: 30000,
+          onSubmit: 'handleRepartoSubmit',
+          onCancel: 'handleRepartoCancel'
+        });
+        
       } catch (error) {
         console.error('Initialization error:', error);
       } finally {
@@ -318,71 +356,55 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
       // Botón nuevo reparto
       document.getElementById('newRepartoBtn')?.addEventListener('click', () => {
         editingReparto = null;
-        document.getElementById('modalTitle').textContent = 'Nuevo Reparto';
-        const form = document.getElementById('repartoForm') as HTMLFormElement;
-        if (form) form.reset();
-        document.getElementById('repartoModal')?.classList.remove('hidden');
-      });
-
-      // Cerrar modal
-      document.getElementById('cancelBtn')?.addEventListener('click', () => {
-        document.getElementById('repartoModal')?.classList.add('hidden');
-      });
-
-      // Submit formulario
-      document.getElementById('repartoForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(e.target as HTMLFormElement);
-        const repartoData = Object.fromEntries(formData);
-
-        try {
-          const url = editingReparto ? `/api/repartos/${editingReparto.id}` : '/api/repartos';
-          const method = editingReparto ? 'PUT' : 'POST';
-          
-          const response = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(repartoData)
-          });
-
-          if (response.ok) {
-            document.getElementById('repartoModal')?.classList.add('hidden');
-            await loadData();
-          } else {
-            alert('Error al guardar el reparto');
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('Error al guardar el reparto');
-        }
+        const titleEl = document.getElementById('repartoForm-title');
+        if (titleEl) titleEl.textContent = 'Nuevo Reparto';
+        repartoFormManager?.open({});
       });
     }
+
+    // Handler functions for SmartForm
+    window.handleRepartoSubmit = async function(data) {
+      try {
+        const url = editingReparto ? `/api/repartos/${editingReparto.id}` : '/api/repartos';
+        const method = editingReparto ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          repartoFormManager?.close();
+          await loadData();
+          
+          // Mostrar notificación de éxito
+          if (editingReparto) {
+            showSuccess('Reparto actualizado', 'Los datos del reparto se han actualizado correctamente');
+          } else {
+            showSuccess('Reparto creado', 'El nuevo reparto se ha programado exitosamente');
+          }
+        } else {
+          showError('Error', 'No se pudo guardar el reparto. Inténtalo de nuevo.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showError('Error de conexión', 'No se pudo conectar con el servidor');
+      }
+    };
+    
+    window.handleRepartoCancel = function() {
+      editingReparto = null;
+    };
 
     // Global functions
     window.editReparto = function(repartoId) {
       const reparto = repartos.find(r => r.id === repartoId);
       if (reparto) {
         editingReparto = reparto;
-        document.getElementById('modalTitle').textContent = 'Editar Reparto';
-        
-        // Fill form
-        const form = document.getElementById('repartoForm');
-        if (form) {
-          const inputs = form.querySelectorAll('input, select, textarea');
-          inputs.forEach(input => {
-            const name = input.getAttribute('name');
-            if (name && reparto[name] !== undefined) {
-              if (name === 'fecha_entrega' && reparto[name]) {
-                input.value = new Date(reparto[name]).toISOString().split('T')[0];
-              } else {
-                input.value = reparto[name] || '';
-              }
-            }
-          });
-        }
-        
-        document.getElementById('repartoModal')?.classList.remove('hidden');
+        const titleEl = document.getElementById('repartoForm-title');
+        if (titleEl) titleEl.textContent = 'Editar Reparto';
+        repartoFormManager?.open(reparto);
       }
     };
 
@@ -395,12 +417,13 @@ import LoadingSpinner from '../components/LoadingSpinner.astro';
 
           if (response.ok) {
             await loadData();
+            showSuccess('Reparto eliminado', 'El reparto se ha eliminado correctamente');
           } else {
-            alert('Error al eliminar el reparto');
+            showError('Error', 'No se pudo eliminar el reparto');
           }
         } catch (error) {
           console.error('Error:', error);
-          alert('Error al eliminar el reparto');
+          showError('Error de conexión', 'No se pudo conectar con el servidor');
         }
       }
     };
