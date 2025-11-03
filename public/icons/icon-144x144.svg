@@ -1,0 +1,54 @@
+<svg width="144" height="144" viewBox="0 0 144 144" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient144" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="truckGradient144" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F0F8FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo con gradiente -->
+  <rect x="0" y="0" width="144" height="144" rx="18" fill="url(#bgGradient144)"/>
+  
+  <!-- Sombra del camión -->
+  <ellipse cx="72" cy="120" rx="34" ry="6" fill="rgba(0,0,0,0.1)"/>
+  
+  <!-- Cuerpo principal del camión -->
+  <rect x="30" y="60" width="60" height="30" rx="3" fill="url(#truckGradient144)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  
+  <!-- Cabina del camión -->
+  <rect x="90" y="71" width="24" height="19" rx="3" fill="url(#truckGradient144)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  
+  <!-- Ventana de la cabina -->
+  <rect x="94" y="75" width="16" height="6" rx="1.5" fill="rgba(74,144,226,0.3)"/>
+  
+  <!-- Ruedas -->
+  <circle cx="45" cy="98" r="9" fill="#2D3748" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <circle cx="101" cy="98" r="9" fill="#2D3748" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  
+  <!-- Centro de las ruedas -->
+  <circle cx="45" cy="98" r="4.5" fill="#4A5568"/>
+  <circle cx="101" cy="98" r="4.5" fill="#4A5568"/>
+  
+  <!-- Detalles del camión -->
+  <rect x="34" y="64" width="6" height="6" rx="1" fill="rgba(74,144,226,0.6)"/>
+  <rect x="34" y="73" width="6" height="6" rx="1" fill="rgba(74,144,226,0.6)"/>
+  <rect x="34" y="82" width="6" height="6" rx="1" fill="rgba(74,144,226,0.6)"/>
+  
+  <!-- Icono de ubicación -->
+  <g transform="translate(52, 34)">
+    <circle cx="9" cy="9" r="9" fill="#34C759" stroke="white" stroke-width="1.5"/>
+    <circle cx="9" cy="7.5" r="3" fill="white"/>
+    <path d="M9 10.5 L6 15 L12 15 Z" fill="#34C759"/>
+  </g>
+  
+  <!-- Líneas de movimiento -->
+  <g opacity="0.6">
+    <path d="M19 52 L26 52" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M19 56 L24 56" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M19 60 L22 60" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,244 @@
+---
+export interface Props {
+  size?: 'sm' | 'md' | 'lg';
+  position?: 'fixed' | 'relative';
+  className?: string;
+}
+
+const {
+  size = 'md',
+  position = 'relative',
+  className = ''
+} = Astro.props;
+
+const sizeClasses = {
+  sm: 'w-10 h-6',
+  md: 'w-12 h-7',
+  lg: 'w-14 h-8'
+};
+
+const thumbSizes = {
+  sm: 'w-4 h-4',
+  md: 'w-5 h-5',
+  lg: 'w-6 h-6'
+};
+
+const positionClasses = {
+  fixed: 'fixed top-4 right-4 z-50',
+  relative: 'relative'
+};
+---
+
+<div class={`theme-toggle-container ${positionClasses[position]} ${className}`}>
+  <button
+    id="theme-toggle"
+    type="button"
+    class={`${sizeClasses[size]} bg-gray-200 dark:bg-gray-700 relative inline-flex items-center justify-center rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800`}
+    role="switch"
+    aria-checked="false"
+    aria-label="Cambiar tema"
+    title="Cambiar entre modo claro y oscuro"
+  >
+    <!-- Thumb del toggle -->
+    <span
+      id="theme-thumb"
+      class={`${thumbSizes[size]} bg-white dark:bg-gray-300 absolute left-0.5 top-0.5 inline-block rounded-full shadow transform transition-transform duration-200 ease-in-out translate-x-0 dark:translate-x-5`}
+    >
+      <!-- Icono de sol (modo claro) -->
+      <svg
+        id="sun-icon"
+        class="w-full h-full p-0.5 text-yellow-500 transition-opacity duration-200"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      
+      <!-- Icono de luna (modo oscuro) -->
+      <svg
+        id="moon-icon"
+        class="w-full h-full p-0.5 text-gray-700 transition-opacity duration-200 opacity-0 absolute inset-0"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+      </svg>
+    </span>
+  </button>
+</div>
+
+<style>
+  /* Asegurar que las transiciones se vean suaves */
+  .theme-toggle-container button {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  /* Estados hover y focus mejorados */
+  .theme-toggle-container button:hover {
+    scale: 1.05;
+  }
+  
+  .theme-toggle-container button:active {
+    scale: 0.95;
+  }
+  
+  /* Mejoras para el thumb */
+  #theme-thumb {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Transiciones de iconos */
+  #sun-icon, #moon-icon {
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  /* Estado dark mode */
+  .dark #theme-thumb {
+    transform: translateX(1.25rem); /* Ajustar según el tamaño */
+  }
+  
+  .dark #sun-icon {
+    opacity: 0;
+  }
+  
+  .dark #moon-icon {
+    opacity: 1;
+  }
+  
+  /* Animación de entrada */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .theme-toggle-container {
+    animation: slideIn 0.3s ease-out;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('theme-toggle');
+    const thumb = document.getElementById('theme-thumb');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    
+    if (!toggle) return;
+    
+    // Función para aplicar tema
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        toggle.setAttribute('aria-checked', 'true');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        toggle.setAttribute('aria-checked', 'false');
+        localStorage.setItem('theme', 'light');
+      }
+      
+      // Actualizar meta theme-color para PWA
+      updateThemeColor(theme);
+    }
+    
+    // Función para detectar preferencia del sistema
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    // Función para obtener tema inicial
+    function getInitialTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        return savedTheme;
+      }
+      return getSystemTheme();
+    }
+    
+    // Función para actualizar theme-color meta tag
+    function updateThemeColor(theme) {
+      let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+      if (!themeColorMeta) {
+        themeColorMeta = document.createElement('meta');
+        themeColorMeta.name = 'theme-color';
+        document.head.appendChild(themeColorMeta);
+      }
+      
+      themeColorMeta.content = theme === 'dark' ? '#111827' : '#ffffff';
+    }
+    
+    // Aplicar tema inicial
+    const initialTheme = getInitialTheme();
+    applyTheme(initialTheme);
+    
+    // Event listener para el toggle
+    toggle.addEventListener('click', function() {
+      const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+      
+      // Agregar animación de feedback
+      toggle.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        toggle.style.transform = 'scale(1)';
+      }, 100);
+      
+      // Dispatch evento personalizado para otros componentes
+      window.dispatchEvent(new CustomEvent('themeChanged', {
+        detail: { theme: newTheme }
+      }));
+    });
+    
+    // Escuchar cambios en la preferencia del sistema
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      // Solo aplicar si no hay preferencia guardada
+      if (!localStorage.getItem('theme')) {
+        applyTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+    
+    // Función global para cambiar tema programáticamente
+    window.setTheme = function(theme) {
+      if (theme === 'dark' || theme === 'light') {
+        applyTheme(theme);
+      } else if (theme === 'system') {
+        localStorage.removeItem('theme');
+        applyTheme(getSystemTheme());
+      }
+    };
+    
+    // Función global para obtener tema actual
+    window.getCurrentTheme = function() {
+      return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    };
+    
+    // Keyboard support
+    toggle.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle.click();
+      }
+    });
+  });
+  
+  // Aplicar tema inmediatamente para evitar flash
+  (function() {
+    const savedTheme = localStorage.getItem('theme');
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const theme = savedTheme || systemTheme;
+    
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+</script>

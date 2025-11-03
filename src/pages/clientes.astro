@@ -2,12 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
 import LoadingSpinner from '../components/LoadingSpinner.astro';
+import LoadingSkeleton from '../components/LoadingSkeleton.astro';
 import SmartForm from '../components/forms/SmartForm.astro';
 import SmartInput from '../components/forms/SmartInput.astro';
 import SmartSelect from '../components/forms/SmartSelect.astro';
 import InteractiveButton from '../components/interactions/InteractiveButton.astro';
 import InteractiveCard from '../components/interactions/InteractiveCard.astro';
 import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
+import ResponsiveSearch from '../components/search/ResponsiveSearch.astro';
 ---
 
 <Layout title="Clientes - Sistema de Gestión">
@@ -28,7 +30,7 @@ import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
           data-stagger="0.1"
         >
           <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-4">
               <h2 class="text-lg font-medium text-gray-900">Clientes</h2>
               <InteractiveButton 
                 variant="primary"
@@ -42,10 +44,38 @@ import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
                 Nuevo Cliente
               </InteractiveButton>
             </div>
+            <!-- Búsqueda responsiva -->
+            <ResponsiveSearch 
+              id="clientSearch"
+              placeholder="Buscar clientes por nombre, email o teléfono..."
+              onSearch="handleClientSearch"
+              showFilters={true}
+              filters={[
+                {
+                  name: 'estado',
+                  label: 'Estado',
+                  type: 'select',
+                  options: [
+                    { value: 'Activo', label: 'Activo' },
+                    { value: 'Inactivo', label: 'Inactivo' }
+                  ]
+                },
+                {
+                  name: 'ciudad',
+                  label: 'Ciudad',
+                  type: 'text'
+                }
+              ]}
+            />
           </div>
           <div id="clientTableContainer" class="p-6">
-            <div class="text-center py-8">
-              <p class="text-gray-500">Cargando clientes...</p>
+            <!-- Skeleton loading para cards móviles -->
+            <div class="md:hidden">
+              <LoadingSkeleton type="card" count={4} />
+            </div>
+            <!-- Skeleton loading para tabla desktop -->
+            <div class="hidden md:block">
+              <LoadingSkeleton type="table" count={5} />
             </div>
           </div>
         </InteractiveCard>
@@ -117,6 +147,7 @@ import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
 
   <script>
     let clients = [];
+    let allClients = []; // Copia original para búsquedas
     let editingClient = null;
     let clientFormManager = null;
 
@@ -188,21 +219,169 @@ import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
         
         if (result.success) {
           clients = result.data || [];
+          allClients = [...clients]; // Guardar copia original para búsquedas
           renderClientsTable();
         } else {
-          console.error('Error loading clients:', result.message);
+          // Error de conexión a la base de datos
+          console.error('Database connection error:', result.message);
+          clients = [];
+          allClients = [];
+          renderDatabaseError(result);
         }
         
       } catch (error) {
         console.error('Error loading clients:', error);
         clients = [];
-        renderClientsTable();
+        allClients = [];
+        renderNetworkError();
       }
+    }
+
+    // Función de búsqueda responsiva
+    function handleClientSearch(searchTerm, filters) {
+      let filteredClients = [...allClients];
+      
+      // Aplicar búsqueda por texto
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase();
+        filteredClients = filteredClients.filter(client => 
+          (client.nombre && client.nombre.toLowerCase().includes(search)) ||
+          (client.email && client.email.toLowerCase().includes(search)) ||
+          (client.telefono && client.telefono.toLowerCase().includes(search)) ||
+          (client.direccion && client.direccion.toLowerCase().includes(search))
+        );
+      }
+      
+      // Aplicar filtros
+      if (filters.estado) {
+        filteredClients = filteredClients.filter(client => client.estado === filters.estado);
+      }
+      
+      if (filters.ciudad) {
+        const ciudad = filters.ciudad.toLowerCase();
+        filteredClients = filteredClients.filter(client => 
+          client.direccion && client.direccion.toLowerCase().includes(ciudad)
+        );
+      }
+      
+      // Actualizar la lista y renderizar
+      clients = filteredClients;
+      renderClientsTable();
+      
+      // Mostrar mensaje si no hay resultados
+      if (filteredClients.length === 0 && (searchTerm || Object.keys(filters).length > 0)) {
+        const container = document.getElementById('clientTableContainer');
+        if (container) {
+          container.innerHTML = `
+            <div class="text-center py-8">
+              <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29.82-5.657 2.172M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+              </svg>
+              <p class="text-lg font-medium text-gray-900">No se encontraron clientes</p>
+              <p class="text-gray-500">Intenta ajustar los criterios de búsqueda</p>
+              <button onclick="clearSearch()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                Limpiar búsqueda
+              </button>
+            </div>
+          `;
+        }
+      }
+    }
+
+    // Función para limpiar búsqueda
+    function clearSearch() {
+      clients = [...allClients];
+      renderClientsTable();
+      
+      // Limpiar campo de búsqueda
+      const searchInput = document.getElementById('clientSearch-input');
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+      }
+    }
+
+    // Exponer funciones globalmente
+    window.handleClientSearch = handleClientSearch;
+    window.clearSearch = clearSearch;
+
+    // Función para mostrar error de base de datos
+    function renderDatabaseError(result) {
+      const container = document.getElementById('clientTableContainer');
+      if (!container) return;
+
+      // Ocultar skeleton loading
+      const skeletons = container.querySelectorAll('.skeleton-container');
+      skeletons.forEach(skeleton => skeleton.style.display = 'none');
+
+      container.innerHTML = `
+        <div class="text-center py-12">
+          <div class="bg-red-50 border border-red-200 rounded-xl p-8 max-w-md mx-auto">
+            <svg class="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-red-800 mb-2">Sin conexión a la base de datos</h3>
+            <p class="text-red-600 mb-4">${result.message || 'No se puede conectar con la base de datos'}</p>
+            <div class="space-y-2">
+              <p class="text-sm text-red-500">• Verifica la configuración de la base de datos</p>
+              <p class="text-sm text-red-500">• Asegúrate de que el servidor PostgreSQL esté ejecutándose</p>
+              <p class="text-sm text-red-500">• Revisa las credenciales de conexión</p>
+            </div>
+            <button onclick="loadClients()" class="mt-6 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+              Reintentar conexión
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Función para mostrar error de red
+    function renderNetworkError() {
+      const container = document.getElementById('clientTableContainer');
+      if (!container) return;
+
+      // Ocultar skeleton loading
+      const skeletons = container.querySelectorAll('.skeleton-container');
+      skeletons.forEach(skeleton => skeleton.style.display = 'none');
+
+      container.innerHTML = `
+        <div class="text-center py-12">
+          <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-8 max-w-md mx-auto">
+            <svg class="w-16 h-16 text-yellow-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-yellow-800 mb-2">Error de conexión</h3>
+            <p class="text-yellow-600 mb-4">No se pudo conectar con el servidor</p>
+            <div class="space-y-2">
+              <p class="text-sm text-yellow-600">• Verifica tu conexión a internet</p>
+              <p class="text-sm text-yellow-600">• El servidor podría estar temporalmente no disponible</p>
+            </div>
+            <button onclick="loadClients()" class="mt-6 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Funciones auxiliares para notificaciones (placeholder hasta implementar sistema completo)
+    function showSuccess(title, message) {
+      console.log(`✅ ${title}: ${message}`);
+      // Aquí se podría implementar un toast/notificación visual
+    }
+
+    function showError(title, message) {
+      console.error(`❌ ${title}: ${message}`);
+      // Aquí se podría implementar un toast/notificación visual
     }
 
     function renderClientsTable() {
       const container = document.getElementById('clientTableContainer');
       if (!container) return;
+
+      // Ocultar skeleton loading
+      const skeletons = container.querySelectorAll('.skeleton-container');
+      skeletons.forEach(skeleton => skeleton.style.display = 'none');
 
       if (clients.length === 0) {
         container.innerHTML = `
@@ -212,13 +391,17 @@ import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
             </svg>
             <p class="text-lg font-medium text-gray-900">No hay clientes</p>
             <p class="text-gray-500">Comienza agregando tu primer cliente</p>
+            <button onclick="document.querySelector('[data-button-id=\"newClientBtn\"]').click()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+              Agregar Cliente
+            </button>
           </div>
         `;
         return;
       }
 
-      const tableHTML = `
-        <div class="overflow-x-auto">
+      // Vista Desktop (tabla tradicional)
+      const desktopTableHTML = `
+        <div class="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 rounded-xl hidden md:block">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -231,42 +414,25 @@ import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               ${clients.map(client => `
-                <tr class="interactive-row hover:bg-gray-50 transition-colors duration-200">
+                <tr class="hover:bg-gray-50 transition-colors duration-200">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     ${client.nombre || client.razonsocial || 'Sin nombre'}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${client.email || '-'}
+                    ${client.email || 'No especificado'}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${client.telefono || '-'}
+                    ${client.telefono || 'No especificado'}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-all duration-200 ${
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       client.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }">
                       ${client.estado || 'Activo'}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <div class="flex justify-center space-x-2">
-                      <button onclick="viewClient(${client.id})" class="interactive-button text-green-600 hover:text-green-900 p-2 rounded transition-all duration-200 hover:bg-green-50" title="Ver detalle">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                      </button>
-                      <button onclick="editClient(${client.id})" class="interactive-button text-blue-600 hover:text-blue-900 p-2 rounded transition-all duration-200 hover:bg-blue-50" title="Editar">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                      </button>
-                      <button onclick="deleteClient(${client.id})" class="interactive-button text-red-600 hover:text-red-900 p-2 rounded transition-all duration-200 hover:bg-red-50" title="Eliminar">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                      </button>
-                    </div>
+                    ${generateActionButtons(client.id)}
                   </td>
                 </tr>
               `).join('')}
@@ -275,7 +441,70 @@ import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
         </div>
       `;
 
-      container.innerHTML = tableHTML;
+      // Vista Mobile (cards)
+      const mobileCardsHTML = `
+        <div class="md:hidden space-y-4">
+          ${clients.map(client => `
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md hover:border-gray-300 transition-all duration-200">
+              <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+                <div>
+                  <div class="font-semibold text-gray-900 text-lg">${client.nombre || client.razonsocial || 'Sin nombre'}</div>
+                  <div class="text-sm text-gray-500 mt-1">${client.email || 'No especificado'}</div>
+                </div>
+                <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                  client.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }">
+                  ${client.estado || 'Activo'}
+                </span>
+              </div>
+              
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-gray-500">Teléfono</span>
+                  <span class="text-sm text-gray-900 font-medium">${client.telefono || 'No especificado'}</span>
+                </div>
+                ${client.direccion ? `
+                  <div class="flex items-start justify-between">
+                    <span class="text-sm font-medium text-gray-500">Dirección</span>
+                    <span class="text-sm text-gray-900 font-medium text-right ml-2">${client.direccion}</span>
+                  </div>
+                ` : ''}
+              </div>
+              
+              <div class="flex items-center justify-end space-x-2 mt-4 pt-3 border-t border-gray-100">
+                ${generateActionButtons(client.id)}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      container.innerHTML = desktopTableHTML + mobileCardsHTML;
+    }
+
+    function generateActionButtons(clientId) {
+      return `
+        <div class="flex justify-center space-x-2">
+          <button onclick="viewClient(${clientId})" class="p-2 rounded-lg transition-all duration-200 text-green-600 hover:text-green-700 hover:bg-green-50" title="Ver detalle">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m6-6h-6m6 0h6"></path>
+            </svg>
+          </button>
+          <button onclick="editClient(${clientId})" class="p-2 rounded-lg transition-all duration-200 text-blue-600 hover:text-blue-700 hover:bg-blue-50" title="Editar">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+          </button>
+          <button onclick="deleteClient(${clientId})" class="p-2 rounded-lg transition-all duration-200 text-red-600 hover:text-red-700 hover:bg-red-50" title="Eliminar">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <polyline points="3,6 5,6 21,6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
+      `;
     }
 
     function setupEventListeners() {
@@ -391,6 +620,48 @@ import ClientDetailModal from '../components/modals/ClientDetailModal.astro';
     .interactive-button:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilos responsivos para móviles */
+    @media (max-width: 480px) {
+      .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+        margin-left: 0;
+        margin-bottom: 0.5rem;
+      }
+      
+      .md\\:hidden .flex.justify-center {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+      }
+      
+      .md\\:hidden button {
+        padding: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      
+      .md\\:hidden button svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    /* Mejoras para cards en móviles */
+    @media (max-width: 768px) {
+      .md\\:hidden .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1rem;
+      }
+      
+      .md\\:hidden .rounded-xl {
+        border-radius: 0.75rem;
+      }
+      
+      .md\\:hidden .shadow-sm:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
     }
   </style>
 </Layout>

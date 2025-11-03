@@ -15,9 +15,15 @@ export async function GET({ request }) {
     });
 
   } catch (error) {
-    console.error('Error fetching clientes:', error);
-    return new Response(JSON.stringify({ error: 'Error al obtener clientes' }), {
-      status: 500,
+    console.error('Database connection error:', error);
+    
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'No hay conexión a la base de datos',
+      message: 'No se puede conectar con la base de datos. Verifica la configuración de conexión.',
+      code: 'DB_CONNECTION_ERROR'
+    }), {
+      status: 503,
       headers: { 'Content-Type': 'application/json' }
     });
   }
@@ -35,20 +41,35 @@ export async function POST({ request }) {
       });
     }
 
-    const result = await query(
-      `INSERT INTO clientes (codigoalte, razonsocial, nombre, direccion, telefono, rut, longitud, latitud, estado)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Activo')
-       RETURNING *`,
-      [codigoalte, razonsocial, nombre, direccion, telefono, rut, longitud, latitud]
-    );
+    try {
+      const result = await query(
+        `INSERT INTO clientes (codigoalte, razonsocial, nombre, direccion, telefono, rut, longitud, latitud, estado)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Activo')
+         RETURNING *`,
+        [codigoalte, razonsocial, nombre, direccion, telefono, rut, longitud, latitud]
+      );
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: result.rows[0]
-    }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' }
-    });
+      return new Response(JSON.stringify({
+        success: true,
+        data: result.rows[0]
+      }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+    } catch (dbError) {
+      console.error('Database connection error on create:', dbError);
+      
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'No hay conexión a la base de datos',
+        message: 'No se puede conectar con la base de datos para crear el cliente.',
+        code: 'DB_CONNECTION_ERROR'
+      }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
   } catch (error) {
     console.error('Error creating cliente:', error);

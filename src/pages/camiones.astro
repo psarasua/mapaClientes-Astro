@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
 import LoadingSpinner from '../components/LoadingSpinner.astro';
+import LoadingSkeleton from '../components/LoadingSkeleton.astro';
+import PullToRefresh from '../components/interactions/PullToRefresh.astro';
 import SmartForm from '../components/forms/SmartForm.astro';
 import SmartInput from '../components/forms/SmartInput.astro';
 import SmartSelect from '../components/forms/SmartSelect.astro';
@@ -11,6 +13,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
 
 <Layout title="Camiones - Sistema de Gestión">
   <Navigation currentPage="camiones" />
+  <PullToRefresh />
   
   <LoadingSpinner message="Cargando camiones..." />
 
@@ -99,9 +102,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
             </div>
           </div>
           <div id="camionTableContainer" class="p-6">
-            <div class="text-center py-8">
-              <p class="text-gray-500">Cargando camiones...</p>
-            </div>
+            <LoadingSkeleton type="table" count={5} />
           </div>
         </InteractiveCard>
     </main>
@@ -291,14 +292,14 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
         return;
       }
 
-      const tableHTML = `
-        <div class="overflow-x-auto">
+      // Generar vista desktop (tabla tradicional)
+      const desktopTableHTML = `
+        <div class="hidden md:block overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matrícula</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca/Modelo</th>
                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Capacidad</th>
                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -306,40 +307,22 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               ${camiones.map(camion => `
-                <tr>
+                <tr class="hover:bg-gray-50 transition-colors duration-200">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     ${camion.matricula || '-'}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${camion.marca || '-'}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${camion.modelo || '-'}
+                    <div class="font-medium text-gray-900">${camion.marca || '-'}</div>
+                    <div class="text-sm text-gray-500">${camion.modelo || '-'}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      camion.estado === 'Activo' ? 'bg-green-100 text-green-800' : 
-                      camion.estado === 'Disponible' ? 'bg-blue-100 text-blue-800' :
-                      camion.estado === 'Mantenimiento' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }">
-                      ${camion.estado || 'Inactivo'}
-                    </span>
+                    ${generateEstadoBadge(camion.estado)}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     ${camion.capacidad_kg ? `${camion.capacidad_kg} kg` : '-'}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <button onclick="editCamion(${camion.id})" class="text-blue-600 hover:text-blue-900 mr-2">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                      </svg>
-                    </button>
-                    <button onclick="deleteCamion(${camion.id})" class="text-red-600 hover:text-red-900">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                    </button>
+                    ${generateActionButtons(camion.id)}
                   </td>
                 </tr>
               `).join('')}
@@ -348,7 +331,121 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
         </div>
       `;
 
-      container.innerHTML = tableHTML;
+      // Generar vista móvil (cards)
+      const mobileCardsHTML = `
+        <div class="md:hidden space-y-4">
+          ${camiones.map(camion => `
+            <div class="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow duration-200 p-4">
+              <!-- Header del card -->
+              <div class="flex justify-between items-start mb-3 pb-3 border-b border-gray-100">
+                <div class="flex-1">
+                  <div class="font-semibold text-lg text-gray-900 mb-1">
+                    ${camion.matricula || 'Sin matrícula'}
+                  </div>
+                  <div class="text-sm text-gray-600">
+                    ${camion.marca || '-'} ${camion.modelo || ''}
+                  </div>
+                </div>
+                <div class="ml-3">
+                  ${generateEstadoBadge(camion.estado)}
+                </div>
+              </div>
+              
+              <!-- Información del camión -->
+              <div class="space-y-3 mb-4">
+                ${camion.capacidad_kg ? `
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500 flex items-center">
+                      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+                      </svg>
+                      Capacidad
+                    </span>
+                    <span class="font-medium text-gray-900">${camion.capacidad_kg} kg</span>
+                  </div>
+                ` : ''}
+                
+                ${camion.fecha_adquisicion ? `
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500 flex items-center">
+                      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      Adquisición
+                    </span>
+                    <span class="font-medium text-gray-900">${new Date(camion.fecha_adquisicion).toLocaleDateString()}</span>
+                  </div>
+                ` : ''}
+              </div>
+              
+              <!-- Botones de acción -->
+              <div class="flex justify-end space-x-2 pt-3 border-t border-gray-100">
+                ${generateMobileActionButtons(camion.id)}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      container.innerHTML = desktopTableHTML + mobileCardsHTML;
+    }
+
+    // Función auxiliar para generar badge de estado
+    function generateEstadoBadge(estado) {
+      const badgeClasses = {
+        'Activo': 'bg-green-100 text-green-800',
+        'Disponible': 'bg-blue-100 text-blue-800', 
+        'Mantenimiento': 'bg-yellow-100 text-yellow-800',
+        'Inactivo': 'bg-red-100 text-red-800'
+      };
+      
+      const className = badgeClasses[estado] || 'bg-gray-100 text-gray-800';
+      
+      return `
+        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${className}">
+          ${estado || 'Inactivo'}
+        </span>
+      `;
+    }
+
+    // Función auxiliar para generar botones de acción desktop
+    function generateActionButtons(camionId) {
+      return `
+        <button onclick="editCamion(${camionId})" 
+                class="text-blue-600 hover:text-blue-900 mr-2 p-1 hover:bg-blue-50 rounded transition-colors duration-200"
+                title="Editar camión">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </button>
+        <button onclick="deleteCamion(${camionId})" 
+                class="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded transition-colors duration-200"
+                title="Eliminar camión">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </button>
+      `;
+    }
+
+    // Función auxiliar para generar botones de acción móviles (touch-optimized)
+    function generateMobileActionButtons(camionId) {
+      return `
+        <button onclick="editCamion(${camionId})" 
+                class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-colors duration-200 min-h-[44px] min-w-[44px] justify-center">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          <span class="hidden min-[480px]:inline">Editar</span>
+        </button>
+        <button onclick="deleteCamion(${camionId})" 
+                class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors duration-200 min-h-[44px] min-w-[44px] justify-center">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span class="hidden min-[480px]:inline">Eliminar</span>
+        </button>
+      `;
     }
 
     function setupEventListeners() {

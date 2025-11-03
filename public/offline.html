@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin Conexión - Sistema de Repartos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .offline-container {
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .retry-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin-right: 15px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .retry-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .home-button {
+            background: white;
+            color: #667eea;
+            border: none;
+        }
+        
+        .home-button:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: #5a67d8;
+        }
+        
+        .features-list {
+            margin-top: 40px;
+            text-align: left;
+        }
+        
+        .features-list h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .features-list ul {
+            list-style: none;
+        }
+        
+        .features-list li {
+            padding: 8px 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .features-list li:before {
+            content: "✓";
+            margin-right: 10px;
+            color: #48bb78;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 480px) {
+            .offline-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .retry-button {
+                display: block;
+                margin: 10px auto;
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .cloud-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon cloud-icon">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+                <line x1="12" y1="14" x2="12" y2="14"/>
+                <line x1="12" y1="18" x2="12" y2="18"/>
+            </svg>
+        </div>
+        
+        <h1>Sin Conexión</h1>
+        <p>No hay conexión a internet disponible. Algunas funciones pueden estar limitadas, pero puedes seguir navegando por las páginas visitadas recientemente.</p>
+        
+        <div>
+            <button class="retry-button" onclick="location.reload()">
+                Reintentar
+            </button>
+            <a href="/" class="retry-button home-button">
+                Ir al Inicio
+            </a>
+        </div>
+        
+        <div class="features-list">
+            <h3>Disponible sin conexión:</h3>
+            <ul>
+                <li>Navegación por páginas visitadas</li>
+                <li>Visualización de datos en caché</li>
+                <li>Interfaz completa de la aplicación</li>
+                <li>Los cambios se sincronizarán al reconectar</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Verificar conexión periódicamente
+        function checkConnection() {
+            if (navigator.onLine) {
+                // Mostrar mensaje de reconexión
+                document.body.innerHTML = `
+                    <div class="offline-container">
+                        <div class="offline-icon pulse" style="background: rgba(72, 187, 120, 0.2); border-color: rgba(72, 187, 120, 0.3);">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22,4 12,14.01 9,11.01"/>
+                            </svg>
+                        </div>
+                        <h1>¡Conexión Restaurada!</h1>
+                        <p>La conexión a internet se ha restablecido. Redirigiendo...</p>
+                    </div>
+                `;
+                
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            }
+        }
+        
+        // Verificar cada 5 segundos
+        setInterval(checkConnection, 5000);
+        
+        // Escuchar eventos de conexión
+        window.addEventListener('online', checkConnection);
+        
+        // Actualizar el estado visual según la conexión
+        if (navigator.onLine) {
+            checkConnection();
+        }
+    </script>
+</body>
+</html>

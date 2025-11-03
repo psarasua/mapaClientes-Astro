@@ -20,22 +20,23 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
 
     <!-- Main content (hidden initially) -->
     <div id="mainContent" class="hidden">
-      <!-- Header moderno -->
+      <!-- Header moderno responsivo -->
       <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-          <div class="flex justify-between items-center py-6">
-            <div class="flex items-center space-x-4">
-              <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4 sm:py-6">
+            <div class="flex items-center space-x-3 sm:space-x-4">
+              <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <svg class="w-4 h-4 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
               </div>
               <div>
-                <h1 class="text-2xl font-bold text-gray-900" style="font-family: Inter;">Dashboard</h1>
-                <p class="text-gray-600 text-sm">Panel de control del sistema</p>
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-900" style="font-family: Inter;">Dashboard</h1>
+                <p class="text-gray-600 text-xs sm:text-sm hidden sm:block">Panel de control del sistema</p>
               </div>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 sm:space-x-4">
+              <!-- User info - oculto en móvil pequeño -->
               <div class="hidden md:flex items-center space-x-3">
                 <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                   <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,26 +45,28 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
                 </div>
                 <span id="userName" class="text-gray-700 font-medium text-sm"></span>
               </div>
+              <!-- Logout button responsivo -->
               <InteractiveButton 
                 variant="secondary"
                 size="sm"
-                class="interactive-button"
+                class="interactive-button text-xs sm:text-sm"
                 data-button-id="logoutBtn"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                 </svg>
-                <span>Salir</span>
+                <span class="hidden sm:inline">Salir</span>
               </InteractiveButton>
             </div>
           </div>
         </div>
       </header>
 
-      <!-- Navigation moderna -->
+      <!-- Navigation responsiva -->
       <nav class="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-          <div class="flex space-x-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Desktop navigation -->
+          <div class="hidden md:flex space-x-8">
             <a href="/dashboard" class="px-4 py-4 text-blue-600 border-b-2 border-blue-600 font-semibold text-sm">
               <span class="flex items-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,20 +102,58 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
             <a href="/mapa" class="px-4 py-4 text-gray-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition-all duration-200 font-medium text-sm">
               <span class="flex items-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
                 <span>Mapa</span>
               </span>
             </a>
           </div>
+          
+          <!-- Mobile navigation -->
+          <div class="md:hidden overflow-x-auto scrollbar-hide">
+            <div class="flex space-x-1 px-2 py-2 min-w-max">
+              <a href="/dashboard" class="flex items-center px-3 py-2 text-blue-600 bg-blue-50 border border-blue-200 rounded-lg font-medium text-sm whitespace-nowrap">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Dashboard
+              </a>
+              <a href="/clientes" class="flex items-center px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium text-sm whitespace-nowrap transition-colors duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                Clientes
+              </a>
+              <a href="/camiones" class="flex items-center px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium text-sm whitespace-nowrap transition-colors duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"></path>
+                </svg>
+                Camiones
+              </a>
+              <a href="/repartos" class="flex items-center px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium text-sm whitespace-nowrap transition-colors duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                </svg>
+                Repartos
+              </a>
+              <a href="/mapa" class="flex items-center px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium text-sm whitespace-nowrap transition-colors duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Mapa
+              </a>
+            </div>
+          </div>
         </div>
       </nav>
 
       <!-- Dashboard Content -->
-      <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        <!-- KPI Widgets modernos con animaciones -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-motion="fade-up" data-delay="200">
-          <InteractiveCard hover="lift" data-stagger="0.1">
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <!-- KPI Widgets responsivos con animaciones -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8" data-motion="fade-up" data-delay="200">
+          <InteractiveCard hover="lift" data-stagger="0.1" class="col-span-1">
             <KPIWidget 
               title="Total Clientes"
               value={45}
@@ -124,7 +165,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
               subtitle="Clientes activos"
             />
           </InteractiveCard>
-          <InteractiveCard hover="lift" data-stagger="0.2">
+          <InteractiveCard hover="lift" data-stagger="0.2" class="col-span-1">
             <KPIWidget 
               title="Camiones Activos"
               value={12}
@@ -136,7 +177,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
               subtitle="En operación"
             />
           </InteractiveCard>
-          <InteractiveCard hover="lift" data-stagger="0.3">
+          <InteractiveCard hover="lift" data-stagger="0.3" class="col-span-1">
             <KPIWidget 
               title="Repartos Hoy"
               value={28}
@@ -148,7 +189,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
               subtitle="Programados"
             />
           </InteractiveCard>
-          <InteractiveCard hover="lift" data-stagger="0.4">
+          <InteractiveCard hover="lift" data-stagger="0.4" class="col-span-1">
             <KPIWidget 
               title="Eficiencia"
               value={87}
@@ -157,6 +198,31 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
               trend="up"
               trendValue={4.7}
               color="purple"
+              subtitle="% General"
+            />
+          </InteractiveCard>
+        </div>
+
+        <!-- Gráficos responsivos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8" data-motion="fade-up" data-delay="400">
+          <InteractiveCard hover="lift" data-stagger="0.5" class="col-span-1 lg:col-span-2 xl:col-span-1">
+            <ChartWidget 
+              title="Repartos por Día"
+              type="line"
+              height={300}
+              data={[
+                { x: 'Lun', y: 12 },
+                { x: 'Mar', y: 19 },
+                { x: 'Mié', y: 15 },
+                { x: 'Jue', y: 25 },
+                { x: 'Vie', y: 22 },
+                { x: 'Sáb', y: 18 },
+                { x: 'Dom', y: 8 }
+              ]}
+              color="blue"
+            />
+          </InteractiveCard>
+          <InteractiveCard hover="lift" data-stagger="0.6" class="col-span-1 lg:col-span-2 xl:col-span-1">
               subtitle="Promedio semanal"
               showProgress={true}
             />
@@ -326,4 +392,74 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
       }
     });
   </script>
+
+  <style>
+    /* Ocultar scrollbar horizontal en navegación móvil */
+    .scrollbar-hide {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;     /* Firefox */
+    }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;             /* Chrome, Safari and Opera */
+    }
+    
+    /* Transiciones suaves para el loading */
+    #mainContent {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Optimizaciones para pantallas muy pequeñas */
+    @media (max-width: 480px) {
+      /* Ajustar padding en móviles pequeños */
+      main {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+      
+      /* Comprimir KPI widgets en móviles */
+      .grid.grid-cols-2 {
+        gap: 0.75rem;
+      }
+      
+      /* Hacer los botones más accesibles en móviles */
+      button, a {
+        min-height: 44px;
+      }
+    }
+    
+    /* Mejorar el área de touch en dispositivos móviles */
+    @media (hover: none) and (pointer: coarse) {
+      .interactive-button {
+        padding: 0.75rem 1rem;
+      }
+      
+      nav a {
+        padding: 0.75rem;
+      }
+    }
+    
+    /* Animación suave para cards */
+    .hover\\:shadow-md {
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    
+    /* Responsive grid para gráficos */
+    @media (max-width: 1024px) {
+      .lg\\:grid-cols-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </Layout>

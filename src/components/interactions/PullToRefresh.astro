@@ -1,0 +1,301 @@
+---
+export interface Props {
+  onRefresh?: string;
+  threshold?: number;
+  className?: string;
+  disabled?: boolean;
+}
+
+const {
+  onRefresh = 'handleRefresh',
+  threshold = 60,
+  className = '',
+  disabled = false
+} = Astro.props;
+---
+
+<div id="pull-to-refresh-container" class={`pull-to-refresh-container ${className}`} data-threshold={threshold} data-disabled={disabled}>
+  <!-- Indicador de pull-to-refresh -->
+  <div id="pull-indicator" class="pull-indicator">
+    <div class="pull-indicator-content">
+      <div class="pull-icon">
+        <svg class="w-5 h-5 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+      </div>
+      <div class="pull-text">
+        <span class="pull-text-default">Desliza hacia abajo para actualizar</span>
+        <span class="pull-text-ready hidden">Suelta para actualizar</span>
+        <span class="pull-text-loading hidden">Actualizando...</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Contenido que se puede hacer pull-to-refresh -->
+  <div id="pull-content" class="pull-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .pull-to-refresh-container {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+  }
+  
+  .pull-indicator {
+    position: absolute;
+    top: -80px;
+    left: 0;
+    right: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to bottom, rgba(249, 250, 251, 0.9), rgba(249, 250, 251, 1));
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 10;
+  }
+  
+  .pull-indicator-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .pull-icon {
+    transition: transform 0.3s ease;
+  }
+  
+  .pull-icon.spinning {
+    animation: spin 1s linear infinite;
+  }
+  
+  .pull-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-align: center;
+  }
+  
+  .pull-content {
+    height: 100%;
+    transition: transform 0.3s ease;
+    touch-action: pan-y;
+  }
+  
+  /* Estados del pull indicator */
+  .pull-indicator.pulling {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .pull-indicator.ready .pull-icon {
+    transform: rotate(180deg);
+    color: #3b82f6;
+  }
+  
+  .pull-indicator.loading .pull-icon {
+    color: #3b82f6;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .pull-indicator {
+      background: linear-gradient(to bottom, rgba(17, 24, 39, 0.9), rgba(17, 24, 39, 1));
+    }
+    
+    .pull-text {
+      color: #9ca3af;
+    }
+  }
+  
+  /* Solo activar en dispositivos táctiles */
+  @media (hover: none) and (pointer: coarse) {
+    .pull-to-refresh-container {
+      touch-action: pan-y;
+    }
+  }
+  
+  /* Desactivar en desktop */
+  @media (hover: hover) and (pointer: fine) {
+    .pull-to-refresh-container {
+      touch-action: auto;
+    }
+    
+    .pull-indicator {
+      display: none;
+    }
+  }
+</style>
+
+<script define:vars={{ onRefresh, threshold }}>
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('pull-to-refresh-container');
+    const indicator = document.getElementById('pull-indicator');
+    const content = document.getElementById('pull-content');
+    
+    if (!container || !indicator || !content) return;
+    
+    // Solo activar en dispositivos táctiles
+    if (!('ontouchstart' in window)) return;
+    
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+    let isRefreshing = false;
+    let pullDistance = 0;
+    
+    const disabled = container.dataset.disabled === 'true';
+    if (disabled) return;
+    
+    const thresholdValue = parseInt(container.dataset.threshold) || threshold;
+    
+    // Elementos de texto
+    const textDefault = indicator.querySelector('.pull-text-default');
+    const textReady = indicator.querySelector('.pull-text-ready');
+    const textLoading = indicator.querySelector('.pull-text-loading');
+    const icon = indicator.querySelector('.pull-icon');
+    
+    // Touch events
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    function handleTouchStart(e) {
+      if (isRefreshing) return;
+      
+      // Solo activar si estamos en la parte superior de la página
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      if (scrollTop > 0) return;
+      
+      startY = e.touches[0].clientY;
+      isDragging = true;
+    }
+    
+    function handleTouchMove(e) {
+      if (!isDragging || isRefreshing) return;
+      
+      currentY = e.touches[0].clientY;
+      pullDistance = Math.max(0, currentY - startY);
+      
+      // Solo prevenir scroll si estamos haciendo pull hacia abajo
+      if (pullDistance > 0) {
+        e.preventDefault();
+        
+        // Calcular el desplazamiento con efecto elástico
+        const maxPull = thresholdValue * 1.5;
+        const dampedDistance = pullDistance > thresholdValue 
+          ? thresholdValue + (pullDistance - thresholdValue) * 0.5
+          : pullDistance;
+        
+        const finalDistance = Math.min(dampedDistance, maxPull);
+        
+        // Actualizar posición del indicador
+        indicator.style.transform = `translateY(${finalDistance - 80}px)`;
+        indicator.style.opacity = Math.min(finalDistance / thresholdValue, 1);
+        content.style.transform = `translateY(${finalDistance}px)`;
+        
+        // Actualizar estado visual
+        if (pullDistance >= thresholdValue) {
+          // Estado "ready"
+          indicator.classList.remove('pulling');
+          indicator.classList.add('ready');
+          updateText('ready');
+        } else {
+          // Estado "pulling"
+          indicator.classList.add('pulling');
+          indicator.classList.remove('ready');
+          updateText('pulling');
+        }
+      }
+    }
+    
+    function handleTouchEnd(e) {
+      if (!isDragging || isRefreshing) return;
+      
+      isDragging = false;
+      
+      if (pullDistance >= thresholdValue) {
+        // Activar refresh
+        triggerRefresh();
+      } else {
+        // Resetear posición
+        resetPull();
+      }
+    }
+    
+    function triggerRefresh() {
+      isRefreshing = true;
+      
+      // Animar a posición de loading
+      indicator.style.transform = 'translateY(-20px)';
+      content.style.transform = 'translateY(60px)';
+      indicator.classList.add('loading');
+      icon.classList.add('spinning');
+      updateText('loading');
+      
+      // Llamar función de refresh
+      if (typeof window[onRefresh] === 'function') {
+        window[onRefresh]().then(() => {
+          setTimeout(resetPull, 500); // Pequeño delay para mejor UX
+        }).catch(() => {
+          setTimeout(resetPull, 500);
+        });
+      } else {
+        // Fallback si no hay función definida
+        setTimeout(resetPull, 1500);
+      }
+    }
+    
+    function resetPull() {
+      isRefreshing = false;
+      
+      // Resetear posiciones y clases
+      indicator.style.transform = 'translateY(-80px)';
+      indicator.style.opacity = '0';
+      content.style.transform = 'translateY(0)';
+      
+      indicator.classList.remove('pulling', 'ready', 'loading');
+      icon.classList.remove('spinning');
+      updateText('default');
+      
+      pullDistance = 0;
+    }
+    
+    function updateText(state) {
+      textDefault.classList.add('hidden');
+      textReady.classList.add('hidden');
+      textLoading.classList.add('hidden');
+      
+      switch (state) {
+        case 'ready':
+          textReady.classList.remove('hidden');
+          break;
+        case 'loading':
+          textLoading.classList.remove('hidden');
+          break;
+        default:
+          textDefault.classList.remove('hidden');
+      }
+    }
+    
+    // Función global para resetear manualmente
+    window.resetPullToRefresh = resetPull;
+    
+    // Función global para activar refresh programáticamente
+    window.triggerPullToRefresh = triggerRefresh;
+  });
+</script>

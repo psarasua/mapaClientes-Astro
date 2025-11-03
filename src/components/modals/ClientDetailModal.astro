@@ -1,9 +1,5 @@
 ---
-// src/components/modals/ClientDetailModal.astro
-export interface Props {
-  id?: string;
-}
-
+// src/components/modals/ClientDetailModal.astro - JavaScript puro
 const { id = 'clientDetailModal' } = Astro.props;
 ---
 
@@ -194,20 +190,94 @@ const { id = 'clientDetailModal' } = Astro.props;
     transform: scale(1.1);
   }
 
-  /* Responsive */
+  /* Responsive - Mejorado para móviles */
   @media (max-width: 640px) {
     #clientDetailModal .max-w-2xl {
       max-width: 95vw;
       margin: 0.5rem;
+      max-height: 95vh;
     }
 
     #clientDetailModal .px-8 {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    #clientDetailModal .py-6 {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    #clientDetailModal .p-8 {
+      padding: 1rem;
     }
 
     #clientDetailModal .grid-cols-2 {
       grid-template-columns: 1fr;
+    }
+
+    #clientDetailModal .text-2xl {
+      font-size: 1.25rem;
+    }
+
+    #clientDetailModal .w-16.h-16 {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    #clientDetailModal .w-8.h-8 {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    /* Reducir espaciado en móviles */
+    #clientDetailModal .mb-8 {
+      margin-bottom: 1.5rem;
+    }
+
+    #clientDetailModal .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+      margin-left: 0.75rem;
+    }
+  }
+
+  /* Orientación horizontal en móviles */
+  @media (max-height: 500px) and (orientation: landscape) {
+    #clientDetailModal .max-w-2xl {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    #clientDetailModal .max-h-\[60vh\] {
+      max-height: 50vh;
+    }
+
+    #clientDetailModal .py-6 {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+
+    #clientDetailModal .mb-8 {
+      margin-bottom: 1rem;
+    }
+  }
+
+  /* Pantallas muy pequeñas (< 375px) */
+  @media (max-width: 375px) {
+    #clientDetailModal .px-6 {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    #clientDetailModal .flex.flex-col.sm\\:flex-row {
+      flex-direction: column;
+    }
+
+    #clientDetailModal .gap-3 {
+      gap: 0.5rem;
+    }
+
+    #clientDetailModal .text-lg {
+      font-size: 1rem;
     }
   }
 

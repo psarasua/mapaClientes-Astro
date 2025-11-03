@@ -13,9 +13,14 @@ export async function GET({ request }) {
     });
 
   } catch (error) {
-    console.error('Error fetching camiones:', error);
-    return new Response(JSON.stringify({ error: 'Error al obtener camiones' }), {
-      status: 500,
+    console.error('Database connection error:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'No hay conexión a la base de datos',
+      message: 'No se puede conectar con la base de datos para obtener los camiones.',
+      code: 'DB_CONNECTION_ERROR'
+    }), {
+      status: 503,
       headers: { 'Content-Type': 'application/json' }
     });
   }
@@ -47,9 +52,14 @@ export async function POST({ request }) {
     });
 
   } catch (error) {
-    console.error('Error creating camion:', error);
-    return new Response(JSON.stringify({ error: 'Error al crear camión' }), {
-      status: 500,
+    console.error('Database connection error on create:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'No hay conexión a la base de datos',
+      message: 'No se puede conectar con la base de datos para crear el camión.',
+      code: 'DB_CONNECTION_ERROR'
+    }), {
+      status: 503,
       headers: { 'Content-Type': 'application/json' }
     });
   }

@@ -13,9 +13,14 @@ export async function GET({ request }) {
     });
 
   } catch (error) {
-    console.error('Error fetching rutas:', error);
-    return new Response(JSON.stringify({ error: 'Error al obtener rutas' }), {
-      status: 500,
+    console.error('Database connection error:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'No hay conexión a la base de datos',
+      message: 'No se puede conectar con la base de datos para obtener las rutas.',
+      code: 'DB_CONNECTION_ERROR'
+    }), {
+      status: 503,
       headers: { 'Content-Type': 'application/json' }
     });
   }

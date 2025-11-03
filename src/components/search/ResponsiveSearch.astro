@@ -1,0 +1,387 @@
+---
+export interface Props {
+  id?: string;
+  placeholder?: string;
+  className?: string;
+  onSearch?: string;
+  showFilters?: boolean;
+  filters?: Array<{
+    name: string;
+    label: string;
+    type: 'select' | 'text' | 'date';
+    options?: Array<{ value: string; label: string }>;
+  }>;
+}
+
+const {
+  id = 'responsiveSearch',
+  placeholder = 'Buscar...',
+  className = '',
+  onSearch = 'handleSearch',
+  showFilters = false,
+  filters = []
+} = Astro.props;
+---
+
+<div class={`responsive-search ${className}`}>
+  <!-- Barra de búsqueda principal -->
+  <div class="search-container">
+    <div class="relative">
+      <!-- Input de búsqueda -->
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <input
+          type="text"
+          id={`${id}-input`}
+          class="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          placeholder={placeholder}
+          autocomplete="off"
+        />
+        <!-- Botón de limpiar búsqueda -->
+        <div class="absolute inset-y-0 right-0 flex items-center">
+          <button
+            type="button"
+            id={`${id}-clear`}
+            class="hidden mr-3 p-1 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            title="Limpiar búsqueda"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Botón de filtros para móvil -->
+      {showFilters && filters.length > 0 && (
+        <button
+          type="button"
+          id={`${id}-filters-toggle`}
+          class="md:hidden absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+          title="Filtros"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+          </svg>
+        </button>
+      )}
+    </div>
+  </div>
+
+  <!-- Filtros para desktop -->
+  {showFilters && filters.length > 0 && (
+    <div id={`${id}-filters-desktop`} class="hidden md:flex items-center space-x-4 mt-4">
+      {filters.map((filter) => (
+        <div class="flex-1 min-w-0">
+          <label for={`${id}-${filter.name}`} class="block text-sm font-medium text-gray-700 mb-1">
+            {filter.label}
+          </label>
+          {filter.type === 'select' ? (
+            <select
+              id={`${id}-${filter.name}`}
+              name={filter.name}
+              class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200"
+            >
+              <option value="">Todos</option>
+              {filter.options?.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          ) : filter.type === 'date' ? (
+            <input
+              type="date"
+              id={`${id}-${filter.name}`}
+              name={filter.name}
+              class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200"
+            />
+          ) : (
+            <input
+              type="text"
+              id={`${id}-${filter.name}`}
+              name={filter.name}
+              class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200"
+              placeholder={`Filtrar por ${filter.label.toLowerCase()}`}
+            />
+          )}
+        </div>
+      ))}
+      <div class="pt-6">
+        <button
+          type="button"
+          id={`${id}-apply-filters`}
+          class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+        >
+          Aplicar
+        </button>
+      </div>
+    </div>
+  )}
+
+  <!-- Panel de filtros móvil (modal) -->
+  {showFilters && filters.length > 0 && (
+    <div id={`${id}-filters-mobile`} class="hidden md:hidden fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" id={`${id}-filters-backdrop`}></div>
+
+        <!-- Panel de filtros -->
+        <div class="inline-block align-bottom bg-white rounded-t-xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:rounded-xl sm:p-6">
+          <div class="mb-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-medium text-gray-900">Filtros</h3>
+              <button
+                type="button"
+                id={`${id}-filters-close`}
+                class="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            {filters.map((filter) => (
+              <div>
+                <label for={`${id}-mobile-${filter.name}`} class="block text-sm font-medium text-gray-700 mb-2">
+                  {filter.label}
+                </label>
+                {filter.type === 'select' ? (
+                  <select
+                    id={`${id}-mobile-${filter.name}`}
+                    name={filter.name}
+                    class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200"
+                  >
+                    <option value="">Todos</option>
+                    {filter.options?.map((option) => (
+                      <option value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                ) : filter.type === 'date' ? (
+                  <input
+                    type="date"
+                    id={`${id}-mobile-${filter.name}`}
+                    name={filter.name}
+                    class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    id={`${id}-mobile-${filter.name}`}
+                    name={filter.name}
+                    class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200"
+                    placeholder={`Filtrar por ${filter.label.toLowerCase()}`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div class="mt-6 flex space-x-3">
+            <button
+              type="button"
+              id={`${id}-clear-filters`}
+              class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              Limpiar
+            </button>
+            <button
+              type="button"
+              id={`${id}-apply-filters-mobile`}
+              class="flex-1 px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              Aplicar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
+<script define:vars={{ id, onSearch }}>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById(`${id}-input`);
+    const clearButton = document.getElementById(`${id}-clear`);
+    const filtersToggle = document.getElementById(`${id}-filters-toggle`);
+    const filtersMobile = document.getElementById(`${id}-filters-mobile`);
+    const filtersClose = document.getElementById(`${id}-filters-close`);
+    const filtersBackdrop = document.getElementById(`${id}-filters-backdrop`);
+    const applyFiltersDesktop = document.getElementById(`${id}-apply-filters`);
+    const applyFiltersMobile = document.getElementById(`${id}-apply-filters-mobile`);
+    const clearFilters = document.getElementById(`${id}-clear-filters`);
+
+    let searchTimeout;
+
+    // Búsqueda en tiempo real
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const value = this.value.trim();
+        
+        // Mostrar/ocultar botón de limpiar
+        if (clearButton) {
+          if (value) {
+            clearButton.classList.remove('hidden');
+          } else {
+            clearButton.classList.add('hidden');
+          }
+        }
+
+        // Debounce de búsqueda
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          if (typeof window[onSearch] === 'function') {
+            window[onSearch](value, getFilters());
+          }
+        }, 300);
+      });
+    }
+
+    // Limpiar búsqueda
+    if (clearButton) {
+      clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        this.classList.add('hidden');
+        if (typeof window[onSearch] === 'function') {
+          window[onSearch]('', getFilters());
+        }
+      });
+    }
+
+    // Toggle filtros móvil
+    if (filtersToggle && filtersMobile) {
+      filtersToggle.addEventListener('click', function() {
+        filtersMobile.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      });
+    }
+
+    // Cerrar filtros móvil
+    function closeMobileFilters() {
+      if (filtersMobile) {
+        filtersMobile.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    if (filtersClose) {
+      filtersClose.addEventListener('click', closeMobileFilters);
+    }
+
+    if (filtersBackdrop) {
+      filtersBackdrop.addEventListener('click', closeMobileFilters);
+    }
+
+    // Aplicar filtros desktop
+    if (applyFiltersDesktop) {
+      applyFiltersDesktop.addEventListener('click', function() {
+        if (typeof window[onSearch] === 'function') {
+          window[onSearch](searchInput?.value || '', getFilters());
+        }
+      });
+    }
+
+    // Aplicar filtros móvil
+    if (applyFiltersMobile) {
+      applyFiltersMobile.addEventListener('click', function() {
+        // Sincronizar filtros móvil con desktop
+        syncMobileFiltersToDesktop();
+        closeMobileFilters();
+        
+        if (typeof window[onSearch] === 'function') {
+          window[onSearch](searchInput?.value || '', getFilters());
+        }
+      });
+    }
+
+    // Limpiar filtros
+    if (clearFilters) {
+      clearFilters.addEventListener('click', function() {
+        clearAllFilters();
+        closeMobileFilters();
+        
+        if (typeof window[onSearch] === 'function') {
+          window[onSearch](searchInput?.value || '', {});
+        }
+      });
+    }
+
+    // Función para obtener valores de filtros
+    function getFilters() {
+      const filters = {};
+      const desktopFilters = document.querySelectorAll(`#${id}-filters-desktop [name]`);
+      
+      desktopFilters.forEach(filter => {
+        if (filter.value.trim()) {
+          filters[filter.name] = filter.value.trim();
+        }
+      });
+      
+      return filters;
+    }
+
+    // Sincronizar filtros móvil a desktop
+    function syncMobileFiltersToDesktop() {
+      const mobileFilters = document.querySelectorAll(`#${id}-filters-mobile [name]`);
+      
+      mobileFilters.forEach(mobileFilter => {
+        const desktopFilter = document.getElementById(`${id}-${mobileFilter.name}`);
+        if (desktopFilter) {
+          desktopFilter.value = mobileFilter.value;
+        }
+      });
+    }
+
+    // Limpiar todos los filtros
+    function clearAllFilters() {
+      const allFilters = document.querySelectorAll(`[id*="${id}"] [name]`);
+      allFilters.forEach(filter => {
+        filter.value = '';
+      });
+    }
+
+    // Escape key para cerrar filtros móvil
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && filtersMobile && !filtersMobile.classList.contains('hidden')) {
+        closeMobileFilters();
+      }
+    });
+  });
+</script>
+
+<style>
+  .responsive-search {
+    @apply w-full;
+  }
+  
+  .search-container {
+    @apply relative;
+  }
+  
+  /* Animaciones para el panel móvil */
+  #responsiveSearch-filters-mobile {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Ajustes para pantallas muy pequeñas */
+  @media (max-width: 480px) {
+    .responsive-search input {
+      font-size: 16px; /* Evitar zoom en iOS */
+    }
+  }
+</style>

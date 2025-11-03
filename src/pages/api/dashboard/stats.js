@@ -51,9 +51,14 @@ export async function GET({ request }) {
     });
 
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
-    return new Response(JSON.stringify({ error: 'Error al obtener estadísticas' }), {
-      status: 500,
+    console.error('Database connection error on dashboard stats:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'No hay conexión a la base de datos',
+      message: 'No se pueden obtener las estadísticas. Verifica la conexión a la base de datos.',
+      code: 'DB_CONNECTION_ERROR'
+    }), {
+      status: 503,
       headers: { 'Content-Type': 'application/json' }
     });
   }

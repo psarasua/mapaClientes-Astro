@@ -1,15 +1,5 @@
 ---
-// src/components/interactions/InteractiveCard.astro
-export interface Props {
-  hover?: 'lift' | 'scale' | 'tilt' | 'glow' | 'none';
-  clickable?: boolean;
-  loading?: boolean;
-  selected?: boolean;
-  class?: string;
-  onclick?: string;
-  padding?: 'none' | 'sm' | 'md' | 'lg';
-}
-
+// src/components/interactions/InteractiveCard.astro - JavaScript puro
 const { 
   hover = 'lift',
   clickable = false,

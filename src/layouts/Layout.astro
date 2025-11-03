@@ -2,10 +2,7 @@
 import ToastContainer from '../components/notifications/ToastContainer.astro';
 import MicroAnimations from '../components/interactions/MicroAnimations.astro';
 
-export interface Props {
-  title: string;
-}
-
+// JavaScript puro - sin interfaces
 const { title } = Astro.props;
 ---
 
@@ -18,15 +15,26 @@ const { title } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
     <!-- Fuentes modernas -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Meta tags adicionales -->
+    <!-- Meta tags PWA -->
     <meta name="theme-color" content="#4A90E2">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Repartos">
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png">
     
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -36,6 +44,162 @@ const { title } = Astro.props;
   <body class="font-inter antialiased bg-gray-50 text-gray-900">
     <slot />
     <ToastContainer />
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+          try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('SW registered: ', registration);
+            
+            // Manejar actualizaciones del SW
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              newWorker?.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Nueva versión disponible
+                  if (confirm('Nueva versión disponible. ¿Actualizar ahora?')) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+            
+            // Escuchar mensajes del SW
+            navigator.serviceWorker.addEventListener('message', (event) => {
+              if (event.data && event.data.type === 'SW_UPDATED') {
+                window.location.reload();
+              }
+            });
+            
+          } catch (error) {
+            console.log('SW registration failed: ', error);
+          }
+        });
+        
+        // Manejar controllerchange (cuando SW toma control)
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
+      }
+      
+      // PWA Install Prompt
+      let deferredPrompt;
+      let installButton = null;
+      
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Mostrar botón de instalación si no existe
+        if (!installButton && !window.matchMedia('(display-mode: standalone)').matches) {
+          createInstallButton();
+        }
+      });
+      
+      function createInstallButton() {
+        installButton = document.createElement('button');
+        installButton.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Instalar App
+        `;
+        installButton.className = 'fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 flex items-center gap-2 text-sm font-medium z-50';
+        installButton.style.cssText = `
+          position: fixed;
+          bottom: 1rem;
+          right: 1rem;
+          background: #4A90E2;
+          color: white;
+          padding: 0.75rem 1rem;
+          border-radius: 9999px;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          z-index: 9999;
+          transition: all 0.3s ease;
+        `;
+        
+        installButton.addEventListener('click', async () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+              console.log('PWA instalada');
+            }
+            
+            deferredPrompt = null;
+            installButton.remove();
+            installButton = null;
+          }
+        });
+        
+        document.body.appendChild(installButton);
+        
+        // Auto-hide después de 10 segundos
+        setTimeout(() => {
+          if (installButton) {
+            installButton.style.opacity = '0';
+            installButton.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+              if (installButton) {
+                installButton.remove();
+                installButton = null;
+              }
+            }, 300);
+          }
+        }, 10000);
+      }
+      
+      // Ocultar botón si ya está instalado
+      window.addEventListener('appinstalled', () => {
+        if (installButton) {
+          installButton.remove();
+          installButton = null;
+        }
+        console.log('PWA instalada exitosamente');
+      });
+      
+      // Network status monitoring
+      function updateNetworkStatus() {
+        const isOnline = navigator.onLine;
+        
+        if (!isOnline) {
+          // Mostrar indicador offline
+          if (!document.getElementById('offline-indicator')) {
+            const indicator = document.createElement('div');
+            indicator.id = 'offline-indicator';
+            indicator.innerHTML = `
+              <div style="background: #F59E0B; color: white; padding: 0.5rem 1rem; text-align: center; font-size: 0.875rem; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;">
+                <span>Sin conexión - Trabajando en modo offline</span>
+              </div>
+            `;
+            document.body.prepend(indicator);
+          }
+        } else {
+          // Remover indicador offline
+          const indicator = document.getElementById('offline-indicator');
+          if (indicator) {
+            indicator.remove();
+          }
+        }
+      }
+      
+      window.addEventListener('online', updateNetworkStatus);
+      window.addEventListener('offline', updateNetworkStatus);
+      updateNetworkStatus(); // Check inicial
+    </script>
   </body>
 </html>
 
@@ -78,6 +242,23 @@ const { title } = Astro.props;
     --radius-md: 0.75rem;   /* 12px */
     --radius-lg: 1rem;      /* 16px */
     --radius-xl: 1.5rem;    /* 24px */
+  }
+  
+  /* Dark mode variables */
+  [data-theme="dark"] {
+    --color-background: #111827;
+    --color-surface: #1F2937;
+    --color-text-primary: #F9FAFB;
+    --color-text-secondary: #D1D5DB;
+    --color-text-tertiary: #9CA3AF;
+    --color-border: #374151;
+    --color-border-light: #4B5563;
+    
+    /* Sombras para dark mode */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
   }
   
   /* Configuración base de la tipografía */

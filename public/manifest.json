@@ -1,0 +1,54 @@
+{
+  "name": "Sistema de Gestión de Repartos",
+  "short_name": "Repartos App",
+  "description": "Sistema completo de gestión de clientes, camiones y repartos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A90E2",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.svg",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512", 
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuevo Cliente",
+      "short_name": "Cliente",
+      "description": "Agregar un nuevo cliente",
+      "url": "/clientes?action=new"
+    },
+    {
+      "name": "Nuevo Reparto",
+      "short_name": "Reparto", 
+      "description": "Crear un nuevo reparto",
+      "url": "/repartos?action=new"
+    },
+    {
+      "name": "Ver Mapa",
+      "short_name": "Mapa",
+      "description": "Ver rutas en tiempo real", 
+      "url": "/mapa"
+    }
+  ],
+  "prefer_related_applications": false
+}
