@@ -1,4 +1,4 @@
-import { query } from '../../../lib/database.js';
+import { query } from '../../../lib/base-datos/conexion.js';
 
 export async function GET({ params }) {
   try {

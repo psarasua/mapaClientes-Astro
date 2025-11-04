@@ -1,4 +1,4 @@
-import { clearTokenCookie } from '../../../lib/auth.js';
+import { clearTokenCookie } from '../../../lib/utilidades/autenticacion.js';
 
 export async function POST({ request }) {
   const response = new Response(JSON.stringify({ success: true, message: 'Sesión cerrada correctamente' }), {

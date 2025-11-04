@@ -1,4 +1,4 @@
-import { verifyToken } from '../../../lib/auth.js';
+import { verifyToken } from '../../../lib/utilidades/autenticacion.js';
 
 export async function GET({ request }) {
   try {

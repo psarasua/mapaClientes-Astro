@@ -1,11 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navigation from '../components/Navigation.astro';
-import MotionSimple from '../components/MotionSimple.astro';
+import Navegacion from '../componentes/layout/Navegacion.astro';
+import MovimientoSimple from '../componentes/comunes/MovimientoSimple.astro';
 ---
 
 <Layout title="Mapa de Repartos - Sistema de Repartos">
-  <MotionSimple />
+  <MovimientoSimple />
   <div id="app" class="min-h-screen bg-gray-50">
     <!-- Loading state -->
     <div id="loading" class="flex items-center justify-center min-h-screen">
@@ -17,7 +17,7 @@ import MotionSimple from '../components/MotionSimple.astro';
 
     <!-- Main content -->
     <div id="mainContent" class="hidden">
-      <Navigation currentPage="mapa" />
+      <Navegacion currentPage="mapa" />
 
       <!-- Map Container -->
       <div class="flex h-screen">

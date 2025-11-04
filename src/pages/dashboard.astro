@@ -1,14 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import MotionSimple from '../components/MotionSimple.astro';
+import MovimientoSimple from '../componentes/comunes/MovimientoSimple.astro';
 import KPIWidget from '../components/widgets/KPIWidget.astro';
 import ChartWidget from '../components/widgets/ChartWidget.astro';
-import InteractiveButton from '../components/interactions/InteractiveButton.astro';
-import InteractiveCard from '../components/interactions/InteractiveCard.astro';
+import InteractiveButton from '../componentes/interfaz/InteractiveButton.astro';
+import InteractiveCard from '../componentes/interfaz/InteractiveCard.astro';
 ---
 
 <Layout title="Dashboard - Sistema de Repartos">
-  <MotionSimple />
+  <MovimientoSimple />
   <div id="app" class="min-h-screen bg-gray-50">
     <!-- Loading state -->
     <div id="loading" class="flex items-center justify-center min-h-screen">
@@ -223,7 +223,11 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
             />
           </InteractiveCard>
           <InteractiveCard hover="lift" data-stagger="0.6" class="col-span-1 lg:col-span-2 xl:col-span-1">
+            <KPIWidget 
+              title="Promedio Diario"
+              value={18.5}
               subtitle="Promedio semanal"
+              icon="📊"
               showProgress={true}
             />
           </InteractiveCard>

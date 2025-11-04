@@ -1,18 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navigation from '../components/Navigation.astro';
-import LoadingSpinner from '../components/LoadingSpinner.astro';
-import SmartForm from '../components/forms/SmartForm.astro';
-import SmartInput from '../components/forms/SmartInput.astro';
-import SmartSelect from '../components/forms/SmartSelect.astro';
-import InteractiveButton from '../components/interactions/InteractiveButton.astro';
-import InteractiveCard from '../components/interactions/InteractiveCard.astro';
+import Navegacion from '../componentes/layout/Navegacion.astro';
+import CargandoGirador from '../componentes/comunes/CargandoGirador.astro';
+import FormularioInteligente from '../componentes/formularios/FormularioInteligente.astro';
+import EntradaInteligente from '../componentes/formularios/EntradaInteligente.astro';
+import SelectorInteligente from '../componentes/formularios/SelectorInteligente.astro';
+import InteractiveButton from '../componentes/interfaz/InteractiveButton.astro';
+import InteractiveCard from '../componentes/interfaz/InteractiveCard.astro';
 ---
 
 <Layout title="Repartos - Sistema de Gestión">
-  <Navigation currentPage="repartos" />
+  <Navegacion currentPage="repartos" />
   
-  <LoadingSpinner message="Cargando repartos..." />
+  <CargandoGirador message="Cargando repartos..." />
 
   <main id="mainContent" class="max-w-7xl mx-auto px-6 lg:px-8 py-8 hidden">
     <div class="mb-8">
@@ -101,7 +101,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
     </main>
 
     <!-- Smart Form Modal for Repartos -->
-    <SmartForm 
+    <FormularioInteligente 
       id="repartoForm" 
       title="Nuevo Reparto"
       onSubmit="handleRepartoSubmit"
@@ -110,7 +110,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
       autoSaveInterval={30000}
     >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SmartInput
+        <EntradaInteligente
           name="cliente"
           label="Cliente"
           type="text"
@@ -120,7 +120,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           placeholder="Nombre del cliente"
         />
         
-        <SmartInput
+        <EntradaInteligente
           name="direccion"
           label="Dirección de entrega"
           type="text"
@@ -130,7 +130,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           placeholder="Dirección completa"
         />
         
-        <SmartInput
+        <EntradaInteligente
           name="fecha_entrega"
           label="Fecha de entrega"
           type="date"
@@ -138,7 +138,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           icon="calendar"
         />
         
-        <SmartSelect
+        <SelectorInteligente
           name="estado"
           label="Estado"
           required={true}
@@ -150,7 +150,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           ]}
         />
         
-        <SmartInput
+        <EntradaInteligente
           name="camion"
           label="Camión asignado"
           type="text"
@@ -159,7 +159,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           placeholder="Matrícula del camión"
         />
         
-        <SmartInput
+        <EntradaInteligente
           name="conductor"
           label="Conductor"
           type="text"
@@ -170,7 +170,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
       </div>
       
       <div class="col-span-2">
-        <SmartInput
+        <EntradaInteligente
           name="observaciones"
           label="Observaciones"
           type="textarea"
@@ -179,7 +179,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           placeholder="Observaciones sobre el reparto..."
         />
       </div>
-    </SmartForm>
+    </FormularioInteligente>
   </div>
 
   <script>
@@ -197,7 +197,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
         setupEventListeners();
         
         // Initialize smart form manager
-        repartoFormManager = new SmartFormManager('repartoForm', {
+        repartoFormManager = new FormularioInteligenteManager('repartoForm', {
           autoSave: true,
           autoSaveInterval: 30000,
           onSubmit: 'handleRepartoSubmit',
@@ -557,7 +557,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
       });
     }
 
-    // Handler functions for SmartForm
+    // Handler functions for FormularioInteligente
     window.handleRepartoSubmit = async function(data) {
       try {
         const url = editingReparto ? `/api/repartos/${editingReparto.id}` : '/api/repartos';

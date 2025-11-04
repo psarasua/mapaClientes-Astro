@@ -1,21 +1,21 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navigation from '../components/Navigation.astro';
-import LoadingSpinner from '../components/LoadingSpinner.astro';
-import LoadingSkeleton from '../components/LoadingSkeleton.astro';
-import PullToRefresh from '../components/interactions/PullToRefresh.astro';
-import SmartForm from '../components/forms/SmartForm.astro';
-import SmartInput from '../components/forms/SmartInput.astro';
-import SmartSelect from '../components/forms/SmartSelect.astro';
-import InteractiveButton from '../components/interactions/InteractiveButton.astro';
-import InteractiveCard from '../components/interactions/InteractiveCard.astro';
+import Navegacion from '../componentes/layout/Navegacion.astro';
+import CargandoGirador from '../componentes/comunes/CargandoGirador.astro';
+import CargandoEsqueleto from '../componentes/comunes/CargandoEsqueleto.astro';
+import PullToRefresh from '../componentes/interfaz/PullToRefresh.astro';
+import FormularioInteligente from '../componentes/formularios/FormularioInteligente.astro';
+import EntradaInteligente from '../componentes/formularios/EntradaInteligente.astro';
+import SelectorInteligente from '../componentes/formularios/SelectorInteligente.astro';
+import InteractiveButton from '../componentes/interfaz/InteractiveButton.astro';
+import InteractiveCard from '../componentes/interfaz/InteractiveCard.astro';
 ---
 
 <Layout title="Camiones - Sistema de Gestión">
-  <Navigation currentPage="camiones" />
+  <Navegacion currentPage="camiones" />
   <PullToRefresh />
   
-  <LoadingSpinner message="Cargando camiones..." />
+  <CargandoGirador message="Cargando camiones..." />
 
   <main id="mainContent" class="max-w-7xl mx-auto px-6 lg:px-8 py-8 hidden">
     <div class="mb-8">
@@ -101,14 +101,14 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
               </InteractiveButton>
             </div>
           </div>
-          <div id="camionTableContainer" class="p-6">
-            <LoadingSkeleton type="table" count={5} />
+          <div id="truckTableContainer" class="p-6">
+            <CargandoEsqueleto type="table" count={5} />
           </div>
         </InteractiveCard>
     </main>
 
     <!-- Smart Form Modal for Camions -->
-    <SmartForm 
+    <FormularioInteligente 
       id="camionForm" 
       title="Nuevo Camión"
       onSubmit="handleCamionSubmit"
@@ -117,7 +117,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
       autoSaveInterval={30000}
     >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SmartInput
+        <EntradaInteligente
           name="matricula"
           label="Matrícula"
           type="text"
@@ -127,7 +127,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           placeholder="Ej: ABC-1234"
         />
         
-        <SmartInput
+        <EntradaInteligente
           name="marca"
           label="Marca"
           type="text"
@@ -137,7 +137,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           placeholder="Ej: Mercedes"
         />
         
-        <SmartInput
+        <EntradaInteligente
           name="modelo"
           label="Modelo"
           type="text"
@@ -147,7 +147,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           placeholder="Ej: Actros 1840"
         />
         
-        <SmartInput
+        <EntradaInteligente
           name="capacidad_kg"
           label="Capacidad (kg)"
           type="number"
@@ -158,7 +158,7 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           placeholder="Ej: 18000"
         />
         
-        <SmartSelect
+        <SelectorInteligente
           name="estado"
           label="Estado"
           required={true}
@@ -170,14 +170,14 @@ import InteractiveCard from '../components/interactions/InteractiveCard.astro';
           ]}
         />
         
-        <SmartInput
+        <EntradaInteligente
           name="fecha_adquisicion"
           label="Fecha de Adquisición"
           type="date"
           icon="calendar"
         />
       </div>
-    </SmartForm>
+    </FormularioInteligente>
   </div>
 
   <script>

@@ -1,5 +1,5 @@
-import { query } from '../../../lib/database.js';
-import { comparePassword, generateToken, setTokenCookie } from '../../../lib/auth.js';
+import { query } from '../../../lib/base-datos/conexion.js';
+import { comparePassword, generateToken, setTokenCookie } from '../../../lib/utilidades/autenticacion.js';
 
 export async function POST({ request }) {
   try {

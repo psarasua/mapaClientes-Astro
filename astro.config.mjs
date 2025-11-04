@@ -7,7 +7,16 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   output: 'server',
   adapter: netlify(),
+  server: {
+    port: 4321,
+    host: true
+  },
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: {
+      hmr: {
+        port: 4322
+      }
+    }
   }
 });
